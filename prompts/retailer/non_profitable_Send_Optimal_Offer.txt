@@ -1,0 +1,8 @@
+ (end of counterpart message).
+Formulate a (max 20 words one paragraph) response to your negotiating counterpart using the following strategy (Just output your response, it will be directly sent to the counterpart):
+1. Reflect on the negotiations_transcript so far.
+2. Remember the negotiation_rules.
+3. Send a new offer with both terms (Wholesale Price and Quantity) by using the following optimal_offer:
+
+optimal_offer:
+[

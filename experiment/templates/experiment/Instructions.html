@@ -1,0 +1,291 @@
+{#
+  Single page of instructions, adapted from the example repository's
+  intro/Instructions.html (same card layout and formula boxes, trimmed of
+  the manager/delegation stages). Edit the text freely -- everything on this
+  page is presentation only.
+#}
+{% block title %}
+  Instructions - {{ player.role }}
+{% endblock %}
+
+{% block styles %}
+  <style>
+    .formula-box {
+      background-color: #f8f9fa;
+      border-left: 4px solid #0d6efd;
+      padding: 15px;
+      margin: 15px 0;
+      font-family: 'Courier New', monospace;
+      border-radius: 4px;
+      font-weight: 500;
+      overflow-x: auto;
+    }
+    .example-box {
+      background-color: #e7f3ff;
+      border-left: 4px solid #17a2b8;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
+    .section-card {
+      margin-bottom: 20px;
+    }
+    .image-container {
+      float: right;
+      margin-left: 15px;
+      margin-bottom: 15px;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <!-- Header Card -->
+  <div class="card section-card">
+    <div class="card-body">
+      <p>An economic experiment; there is no deception; your decision has real consequences.</p>
+      <p>
+        Carefully read the instructions, as you will be financially rewarded
+        for your performance.
+      </p>
+    </div>
+  </div>
+
+  {% if is_ai_mode %}
+    <!-- AI counterpart notice (Single-Player sessions only) -->
+    <div class="alert alert-primary" role="alert">
+      <strong>🤖 Please note:</strong> in this session you will negotiate
+      with an <strong>artificial intelligence (AI)</strong> acting as the
+      Retailer. The AI was deployed by a <strong>human retailer</strong>,
+      who earns real money from the deal the AI reaches on their behalf
+      (see <em>Monetary Compensation</em> below).
+    </div>
+  {% endif %}
+
+  <!-- Overview Card -->
+  <div class="card section-card">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">📋 Overview</h5>
+    </div>
+    <div class="card-body">
+  
+      <p>
+        In this exercise, you will take the role of an employee at the
+        <strong>{{ player.role }}</strong> company.
+      </p>
+      <ul class="mb-0">
+        <li>
+          A Supplier and a Retailer negotiate over widgets.
+        </li>
+        {% if is_ai_mode %}
+          <li>
+            In this session the Retailer is an <strong>artificial
+            intelligence (AI) agent</strong>, deployed by a human retailer;
+            you negotiate with the AI as the Supplier.
+          </li>
+        {% endif %}
+        <li>
+          The item is produced by the supplying company at a Production Cost
+          <strong>(PC)</strong> of {{ group.production_cost }}€, which is
+          common knowledge.
+        </li>
+        <li>
+          The item is sold by the retailer company at a Retail Price
+          <strong>(RP)</strong> of {{ retail_prices }}€, drawn with equal
+          probability. <strong>Only the Retailer knows the drawn RP.</strong>
+        </li>
+        <li>
+          Before the negotiation, the Retailer decides what to communicate
+          about the Retail Price: the true value, a value of their own
+          choosing, or nothing. The Supplier waits and is then shown the
+          Retailer's disclosure.
+        </li>
+        <li>
+          The Retailer and Supplier then negotiate via chat on the Wholesale
+          Price <strong>(w)</strong> &amp; Quantity <strong>(q)</strong>.
+        </li>
+        <li>
+          If a deal is reached, the Supplier completes an additional
+          quality-check task before the results are shown (see
+          <em>Quality Checks</em> below).
+        </li>
+        <li>
+          After the negotiation, Demand <strong>(D)</strong> will be randomly
+          drawn from {{ demand_interval }} (equal probability).
+        </li>
+        <li>
+          The Supplier carries the risk of unsold inventory (any q &gt; Demand
+          will expire).
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Objective Card -->
+  <div class="card section-card">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">🎯 Objective</h5>
+    </div>
+    <div class="card-body">
+      <p class="mb-0">
+        Your goal is to agree on a Wholesale Price <strong>(w)</strong> and
+        Quantity <strong>(q)</strong> maximizing your profits.
+      </p>
+    </div>
+  </div>
+
+  <!-- Terms of Negotiation Card -->
+  <div class="card section-card">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">📝 Terms of Negotiation</h5>
+    </div>
+    <div class="card-body">
+      <ul class="mb-0">
+        <li>
+          <strong>Quantity (q)</strong>
+          ranges from {{ C.QUANTITY_MIN }} to {{ C.QUANTITY_MAX }} without
+          decimals.
+        </li>
+        <li>
+          <strong>Wholesale Price (w)</strong>
+          is denoted in euros (€) with two decimals.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Profit Calculation Card -->
+  <div class="card section-card">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">💼 Roles and Profit Calculation</h5>
+    </div>
+    <div class="card-body">
+      <h6 class="mb-3">Supplier Profit</h6>
+      <div class="formula-box">
+        <strong>Supplier Profit = w * min(q, D) - PC * q</strong>
+      </div>
+      <p><strong>Example:</strong></p>
+      <p>The Production Cost (PC) is 1€, and the parties agreed on a
+        wholesale price (w) of 3€ and a quantity (q) of 50:</p>
+      <div class="example-box">
+        <ul class="mb-0">
+          <li>
+            Demand (D) is 75: 3 * min(50, 75) - 1 * 50 = 100€
+          </li>
+          <li>
+            Demand (D) is 25: 3 * min(50, 25) - 1 * 50 = 25€
+          </li>
+          <li>
+            Demand (D) is 50: 3 * min(50, 50) - 1 * 50 = 100€
+          </li>
+        </ul>
+      </div>
+
+      <hr class="my-4">
+
+      <div class="alert alert-info py-2 px-3 mb-4" role="alert">
+        💡 Explanation of <strong><code>min(q, D)</code>:</strong> This
+        represents the <strong>minimum</strong> value between q and D. For
+        example, <code>min(10, 100) = 10</code>.
+      </div>
+
+      <h6 class="mb-3">Retailer Profit</h6>
+      <div class="formula-box">
+        <strong>Retailer Profit = (RP - w) * min(q, D)</strong>
+      </div>
+      <p><strong>Example:</strong></p>
+      <p>The Retail Price (RP) is 4€, and the parties agreed on a
+        wholesale price (w) of 3€ and a quantity (q) of 50:</p>
+      <div class="example-box">
+        <ul class="mb-0">
+          <li>
+            Demand (D) is 75: (4-3) * min(50, 75) = 50€
+          </li>
+          <li>
+            Demand (D) is 25: (4-3) * min(50, 25) = 25€
+          </li>
+          <li>
+            Demand (D) is 50: (4-3) * min(50, 50) = 50€
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quality Checks Card -->
+  <div class="card section-card">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">🔍 Quality Checks (after a deal)</h5>
+    </div>
+    <div class="card-body">
+      <ul class="mb-0">
+        <li>
+          After a successful negotiation, the <strong>Supplier</strong>
+          performs a slider task: each slider placed exactly on
+          {{ C.SLIDER_TARGET }} counts as one passed quality check.
+        </li>
+        <li>
+          Each passed quality check increases the Retail Price
+          <strong>(RP)</strong> by <strong>€{{ quality_rp_per_slider }}</strong>,
+          up to a maximum increase of
+          <strong>€{{ quality_rp_max }}</strong>
+          ({{ C.NUM_SLIDERS }} sliders).
+        </li>
+        <li>
+          <strong>Be aware:</strong> a higher Retail Price benefits
+          <strong>only the Retailer's</strong> profit
+          (RP does not enter the Supplier's profit formula). The Retailer
+          can therefore earn more the better the Supplier performs on the
+          task; the Supplier's own earnings are not affected by it.
+        </li>
+        <li>
+          The task has no time limit, and the Supplier may stop it at any
+          time. The Retailer waits meanwhile.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Compensation Card -->
+  <div class="card section-card">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">💵 Monetary Compensation</h5>
+    </div>
+    <div class="card-body">
+      <ul class="mb-0">
+        <li>
+          Everyone receives a <strong>baseline payment of
+          €{{ formatted_baseline }}</strong> for participating.
+        </li>
+        <li>
+          On top of that, you earn a bonus of
+          <strong>{{ profit_share_pct }}% of your realized profit</strong>
+          from the deal, computed <strong>after the demand is drawn</strong>
+          (Supplier: w * min(q, D) - PC * q; Retailer: (RP - w) * min(q, D),
+          where RP includes the quality-check increases).
+        </li>
+        <li>
+          A negative profit earns no bonus (your payment never falls below
+          the baseline).
+        </li>
+        {% if is_ai_mode %}
+          <li>
+            The AI Retailer negotiates on behalf of a <strong>human
+            retailer</strong>: in the same way that you as the Supplier earn
+            {{ profit_share_pct }}% of your realized deal profit, that human
+            retailer earns <strong>{{ profit_share_pct }}% of the Retailer
+            profit</strong> realized from the deal the AI reaches.
+          </li>
+        {% endif %}
+        <li>
+          You have {{ timeout_minutes }} minutes to reach an agreement. If the
+          time runs out the outcome is an impasse (disagreement), both
+          profits are zero, and both sides receive the baseline payment
+          only. (Note: the timer resets to 30 seconds if a binding offer is sent when less than 30 seconds remain.)
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <br>
+  {% next_button %}
+{% endblock %}

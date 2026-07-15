@@ -1,0 +1,10 @@
+ollama create offer_reader_v2 -f Modelfile_reader_of_offers_v2
+ollama create offer_reader_v3 -f Modelfile_reader_of_offers_v3
+
+Remove a model
+ollama rm offer_reader_v2
+
+ollama create constraint_reader_v2 -f Modelfile_reader_of_constraints_v2
+
+Remove a model
+ollama rm constraint_reader_v2

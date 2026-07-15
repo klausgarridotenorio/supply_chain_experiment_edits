@@ -1,0 +1,52 @@
+.otree-timer {
+  display: none;
+}
+
+.time-left {
+  float: right;
+  margin-top: -55px;
+}
+
+#myPrice {
+  width: 150px;
+  display: block;
+  margin-bottom: 25px;
+}
+
+#myQuantity {
+  width: 150px;
+}
+
+.high-br br {
+   margin-bottom: 30px;
+}
+
+pre {
+  margin: 0;
+}
+
+/* Copied from templates/otree/tags/chat.html */
+.otree-chat {
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin: 0 0 0 0;
+}
+
+.otree-chat__messages {
+    height: 500px;
+    overflow: auto;
+    background: #eee;
+    margin: 2px 0 5px 0;
+}
+
+.otree-chat__nickname {
+    display: inline-block;
+    color: #C07A36;
+    width: 150px;
+    font-weight: bold;
+}
+
+.otree-chat__body {
+  max-width: 775px;
+  display: inline-flex;
+}

@@ -1,0 +1,18 @@
+ (end of counterpart message).
+Formulate a (max 20 words one paragraph) response to your negotiating counterpart using the following strategy (Just output your response, it will be directly sent to the counterpart):
+1. Reflect on the negotiations_transcript so far.
+2. Remember the negotiation_rules.
+3. Try send an offer with both outcomes (Price and Quantity) by matching the price in your counterpart's message based on the following logic:
+The optimal_offer will consist of only one combination of Wholesale Price and Quantity. This offer matches the price from your counterpart's message but has an adjusted quantity. Your task is to propose this specific Price and Quantity combination.
+
+- Example_1: (counterpart message: I can agree to a price of 3€. What quantity can you offer?),
+(optimal_offer: [Price of 3€ and quantity of 50]),
+-- Respose: For a price of 3€, I can offer a quantity of 50. Does that work for you?
+
+- Example_2: (counterpart message: Okay, let's set the price at 2.9€. How about the quantity?),
+(optimal_offer: [Price of 2.9€ and quantity of 42]),
+-- Respose: I agree on the price. For 2.9€, we can provide a quantity of 42. Let's make a deal.
+
+Now is your turn, based on the counterpart message above ending as (end of counterpart message) and the following optimal_offer craft a short response.
+optimal_offer:
+[

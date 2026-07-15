@@ -1,0 +1,41 @@
+{# How-to tab -- migrated from the example repository
+   (templates/instructions.html), with the delegation/AI-specific wording
+   kept behind the bot_opponent flag (inert in the Two-Human game). #}
+<h5>How to Use the Interface</h5>
+<br>
+<h6>📋 Binding vs. Non-Binding Agreements</h6>
+<p>
+  Chat messages are <strong>non-binding</strong>. Only offers
+  <strong>confirmed through the interface</strong> are binding.
+</p>
+<br>
+
+<h6>✅ Finalizing Your Deal</h6>
+<p>
+  Once you reach an agreement, click <strong>"CONFIRM"</strong> to
+  finalize the negotiation.
+</p>
+{% if player.bot_opponent %}
+  <ul class="notes">
+    <li>The button appears when your counterpart is ready</li>
+    <li>AI Agents can automatically accept binding offers</li>
+  </ul>
+{% endif %}
+<br>
+<h6>📤 Sending Binding Offers</h6>
+<p>
+  Use <strong>"Your Current Proposal"</strong> to send binding offers.
+</p>
+<p><strong>IMPORTANT</strong> when the 5 min countdown is below 30 seconds you can re-set it back to 30 seconds by sending a binding offer (max 10 min).</p>
+{% if player.is_retailer %}
+  <p class="alert alert-warning">
+    <strong>⚠️ Important:</strong> Don't accept a wholesale price above
+    {% group.market_price %}€, or you won't make a profit.
+  </p>
+{% endif %}
+<br>
+<h6>🚀 Next Steps</h6>
+<ul>
+  <li>Go to <strong>Negotiate</strong> page to start chatting with your counterpart and to <strong>send/receive offers</strong></li>
+  <li>Visit <strong>Profit Analysis</strong> page to <strong>automatically retrieve the expected profitability</strong> of an offer for you and your counterpart </li>
+</ul>

@@ -1,0 +1,109 @@
+{#
+  Results page -- styling and layout migrated from the example repository's
+  Results.employee.html (cards, alerts, compensation block).
+
+  Shows the participant's OWN outcome: deal terms, drawn demand, realized
+  profit, and the payment breakdown (5€ baseline + 5% of positive profit).
+  The Retailer additionally sees the quality-check RP increase earned by
+  the Supplier's slider task. The Supplier is never shown the Retailer's
+  profit or the effective RP (it would reveal the private retail price).
+#}
+{% block title %}
+  Results
+{% endblock %}
+
+{% block content %}
+  {% if not deal_reached %}
+    <div class="alert alert-warning" role="alert">
+      <h3 class="alert-heading">❌ No Deal Reached</h3>
+      <p class="mb-0">No agreement was reached on time. Both profits are
+        zero, so you receive the baseline payment only.</p>
+    </div>
+  {% else %}
+    <div class="card mb-4">
+      <div class="card-header bg-success text-white">
+        <h3 class="card-title mb-0">✅ Negotiation Results</h3>
+      </div>
+      <div class="card-body">
+        <p><strong>Wholesale Price:</strong>
+          <span class="fs-5">€{{ formatted_deal_price }} per unit</span></p>
+        <p class="mb-0"><strong>Quantity:</strong>
+          <span class="fs-5">{{ formatted_deal_quantity }} units</span></p>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="card mb-4">
+    <div class="card-header bg-info text-white">
+      <h5 class="card-title mb-0">🎲 Demand Draws</h5>
+    </div>
+    <div class="card-body">
+      <p>Demand was drawn <strong>{{ C.NUM_DEMAND_DRAWS }}</strong> times,
+        uniformly from [{{ C.DEMAND_MIN }}, {{ C.DEMAND_MAX }}]:</p>
+      <p><span class="badge bg-light text-dark border fs-6">
+        {{ demand_draws }}</span></p>
+      <p class="mb-0"><strong>Realized Demand (average of the draws,
+        used for the payouts):</strong>
+        <span class="fs-5">{{ formatted_demand }} units</span></p>
+    </div>
+  </div>
+
+  {% if deal_reached %}
+    {% if player.is_retailer %}
+      <div class="card mb-4">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0">🔍 Quality Checks</h5>
+        </div>
+        <div class="card-body">
+          <p>The Supplier passed
+            <strong>{{ quality_sliders }} / {{ C.NUM_SLIDERS }}</strong>
+            quality checks, raising your Retail Price by
+            <strong>€{{ formatted_quality_rp_increase }}</strong>.</p>
+          <p class="mb-0"><strong>Effective Retail Price:</strong>
+            €{{ formatted_effective_rp }} per unit sold.</p>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="card mb-4">
+      <div class="card-header bg-light">
+        <h5 class="card-title mb-0">📊 Your Profit</h5>
+      </div>
+      <div class="card-body">
+        <p class="mb-0"><strong>Realized Profit:</strong>
+          <span class="fs-5">€{{ formatted_profit }}</span></p>
+        {% if profit_is_negative %}
+          <p class="text-muted mb-0">
+            <small>A negative profit does not reduce your payment below the
+              baseline -- it simply earns no bonus.</small></p>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="card border-warning mb-4">
+    <div class="card-header bg-warning">
+      <h5 class="card-title mb-0">💰 Your Compensation</h5>
+    </div>
+    <div class="card-body">
+      <p><strong>Baseline payment:</strong> €{{ formatted_baseline }}</p>
+      <p><strong>Bonus ({{ profit_share_pct }}% of your profit, if
+        positive):</strong> €{{ formatted_bonus }}</p>
+
+      <div class="alert alert-danger mt-3">
+        <strong>⚠️ Important - Please Remember:</strong><br>
+        <h4 class="mt-2">€{{ formatted_total }}</h4>
+        <p class="mb-0">Enter this amount in your payment information.
+          Incorrect amounts cannot be processed.</p>
+      </div>
+
+      {# TODO(admin): replace with your own payment-details form link (the
+         example repository linked an institutional MS Forms page here).
+      <a href="https://example.com/your-payment-form" target="_blank"
+         class="btn btn-primary btn-lg w-100">
+        Fill in your bank details
+      </a>
+      #}
+    </div>
+  </div>
+{% endblock %}

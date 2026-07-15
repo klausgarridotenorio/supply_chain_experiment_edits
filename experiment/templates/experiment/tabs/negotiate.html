@@ -1,0 +1,46 @@
+{# Negotiate tab -- migrated unchanged from the example repository
+   (templates/negotiate.html). The chat is non-binding; only offers sent
+   through the interface table below are binding. #}
+{% include 'experiment/tabs/prices.html' %}
+<h4>Chat</h4>
+<div class='otree-chat'>
+  <div class='otree-chat__messages' id='chat-output'></div>
+  <input type="text" id="chat-input" class="otree-chat__input" size="52"
+         placeholder="Type here...">
+  <button type="button" onclick="sendMessage()" id="btn-chat"
+          class="otree-chat__btn-send">
+    Send
+  </button>
+</div>
+<br>
+
+<h3>Interface</h3>
+<table class="table" style="border: 1px solid black;">
+  <tr>
+    <th>{% player.other.role %} proposal</th>
+    <td>Price<br>Quantity</td>
+    <td id="otherProposal">{% player.other.proposal %}</td>
+    <td></td>
+    <td>
+      <button type="button" id="btnAccept" onclick="sendAccept()" disabled>
+        CONFIRM
+      </button>
+    </td>
+  </tr>
+  <tr>
+    <th>Your current proposal</th>
+    <td class="high-br">Price<br>Quantity</td>
+    <td class="high-br" id="myProposal">{% player.proposal %}</td>
+    <td style="width: 200px;">
+      <input type="number" id="myPrice" placeholder="Enter price"
+             style="width: 100px;">
+      <input type="number" id="myQuantity" placeholder="Enter quantity"
+             style="width: 100px;">
+    </td>
+    <td>
+      <button type="button" onclick="sendOffer()" id="btn-offer">
+        Send new offer
+      </button>
+    </td>
+  </tr>
+</table>

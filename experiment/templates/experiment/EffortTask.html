@@ -1,0 +1,105 @@
+{#
+  Effort Task page (slider task) -- shown ONLY to the Supplier, and ONLY if
+  a deal was reached in the negotiation (see pages.EffortTask.is_displayed).
+  The Retailer idles on the ResultsWaitPage in the meantime.
+
+  The task is UNTIMED and the Next button below is always clickable: the
+  Supplier may proceed whenever they want; whatever was achieved by then is
+  recorded through the hidden inputs (kept in sync by effort_task.js).
+#}
+{% block styles %}
+  <style>
+    #slider-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px 28px;
+    }
+    @media (max-width: 900px) {
+      #slider-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      #slider-grid { grid-template-columns: 1fr; }
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 6px 0;
+    }
+    .slider-row input[type="range"] {
+      flex: 1;
+      min-width: 0;
+    }
+    .slider-value {
+      min-width: 38px;
+      font-weight: bold;
+      text-align: right;
+    }
+    #slider-score-bar {
+      font-size: 1.15rem;
+      text-align: center;
+    }
+  </style>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'experiment/js/effort_task.js' %}"></script>
+{% endblock %}
+
+{% block title %}
+  Additional Task
+{% endblock %}
+
+{% block content %}
+  <div class="alert alert-success" role="alert">
+    ✅ You reached a deal: a Wholesale Price of
+    <strong>{{ group.deal_price }}€</strong> for
+    <strong>{{ group.deal_quantity }}</strong> units.
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">🛠️ Your Task</h5>
+    </div>
+    <div class="card-body">
+      <p>
+        Below you see {{ C.NUM_SLIDERS }} sliders. Drag each slider so that
+        it sits <strong>exactly on {{ C.SLIDER_TARGET }}</strong>. The
+        current value of each slider is shown next to it.
+      </p>
+      <div class="alert alert-info">
+        🔍 Each slider placed exactly on {{ C.SLIDER_TARGET }} is a
+        <strong>passed quality check</strong>: it raises the Retail Price
+        by €{{ quality_rp_per_slider }} (up to +€{{ quality_rp_max }} in
+        total). This increases the <strong>Retailer's</strong> profit --
+        your own earnings are <strong>not</strong> affected by this task.
+      </div>
+      <p class="text-muted">
+        There is no time limit. You can proceed to the next page whenever
+        you want by clicking Next -- also before all sliders are placed.
+      </p>
+
+      <div id="slider-score-bar" class="mb-3">
+        Sliders at target:
+        <strong><span id="sliders-at-target">0</span>
+          / <span id="sliders-total">{{ C.NUM_SLIDERS }}</span></strong>
+      </div>
+
+      <div id="slider-grid"></div>
+    </div>
+  </div>
+
+  {#
+    Hidden bindings for EffortTask.form_fields -- continuously kept in sync
+    by effort_task.js and finalized on form submission, so the data is saved
+    whenever the participant clicks Next, even if they leave early.
+  #}
+  <input type="hidden" name="effort_put_number_of_sliders"
+         id="id_effort_put_number_of_sliders" value="0">
+  <input type="hidden" name="effort_put_time_on_sliders"
+         id="id_effort_put_time_on_sliders" value="0">
+  <input type="hidden" name="effort_put_relative_time_on_sliders"
+         id="id_effort_put_relative_time_on_sliders" value="[]">
+
+  {% next_button %}
+{% endblock %}

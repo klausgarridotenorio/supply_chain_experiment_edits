@@ -1,0 +1,77 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{eurosym}
+\usepackage{amsmath}
+
+\title{Participant Payout Analysis\\\large Supplier--Retailer Negotiation Experiment}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Payment rule}
+Each participant receives a baseline of \euro{5} plus a bonus of 5\% of their
+realized profit (if positive), computed after the demand draw:
+\begin{align*}
+\pi_S &= w \cdot \min(q, D) - PC \cdot q, &
+\pi_R &= (RP_{\mathit{eff}} - w) \cdot \min(q, D),
+\end{align*}
+with $PC=1$, $RP \in \{4,5\}$, $w \in [1,5]$, $q \le 100$, and
+$RP_{\mathit{eff}} = RP + 0.02$ per passed slider (capped at $+1$).
+Demand $D$ is the \emph{average of ten} draws from $U[0,100]$, so
+$D \approx 50 \pm 9$; extreme demand is effectively impossible.
+
+\section*{Bounds}
+\begin{table}[h]\centering
+\begin{tabular}{lccc}
+\toprule
+ & Min & Theoretical max & Realistic max \\
+\midrule
+Supplier   & \euro{5} & \euro{25} & $\approx$\,\euro{14} \\
+Retailer   & \euro{5} & \euro{30} & $\approx$\,\euro{18} \\
+Per pair   & \euro{10} & \euro{35} & $\approx$\,\euro{28} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The minimum is always the baseline (negative profit earns no bonus). The
+theoretical maxima require $D=100$, i.e.\ all ten draws equal to 100
+(probability $\sim 10^{-20}$); the ten-draw average therefore insures the
+budget against extreme payouts. In a 200{,}000-participant simulation the
+largest observed payment was \euro{18.09} (95th percentile: \euro{12.16}).
+
+\section*{Expected payouts (90\% agreement rate)}
+Monte Carlo with deals at or dispersed around the Nash terms
+(RP\,$=4$: $2.80$\euro{}/75; RP\,$=5$: $3.33$\euro{}/80), 10\% of
+participants at baseline only:
+
+\begin{table}[h]\centering
+\begin{tabular}{lcc}
+\toprule
+Sliders passed (quality checks) & Supplier & Retailer \\
+\midrule
+None    & \euro{8.79} & \euro{8.60} \\
+Half    & \euro{8.98} & \euro{9.82} \\
+All 50  & \euro{8.98} & \euro{11.05} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Central estimate:} $\approx$\,\euro{8.90} per participant
+(median \euro{9.10}), i.e.\ $\approx$\,\euro{17.85} per two-human pair.
+Budget rule of thumb: \euro{9} per head, p95 $\approx$ \euro{12},
+practical ceiling $\approx$ \euro{18}.
+
+\section*{Sensitivities}
+\begin{itemize}
+  \item \textbf{Slider effort} is the main lever: each passed slider adds
+        $\approx$\,\euro{0.05} to the Retailer's payment (full effort:
+        $+$\euro{2.5}), while paying the Supplier nothing.
+  \item \textbf{Supplier payouts are flat} ($\approx$\,\euro{8.8--9.0})
+        across bargaining outcomes near the Nash terms.
+  \item \textbf{AI-retailer sessions} pay only the human Supplier:
+        $\approx$\,\euro{8.60} per participant all-in.
+\end{itemize}
+
+\end{document}

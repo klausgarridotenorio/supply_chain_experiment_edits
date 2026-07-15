@@ -1,0 +1,104 @@
+{#
+  Private Information Disclosure page (Retailer only).
+  The Retailer makes their choice by clicking one of three buttons:
+    1. Disclose 4      -> the Supplier is shown an RP of 4€
+    2. Disclose 5      -> the Supplier is shown an RP of 5€
+    3. No Disclosure   -> nothing is shown
+  A click fills the hidden disclosure_choice / disclosed_value form fields
+  and submits the page immediately; the true/own/none categorization is
+  re-derived server-side (see pages.Disclosure.before_next_page).
+  The Supplier is IDLE on the DisclosureWaitPage while this happens, and is
+  then shown the outcome on the DisclosureReceived page.
+#}
+{% block title %}
+  Private Information Disclosure
+{% endblock %}
+
+{% block content %}
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">🔒 Your Private Information</h5>
+    </div>
+    <div class="card-body">
+      <p class="mb-0">
+        Your <strong>Retail Price (RP)</strong> for this negotiation is
+        <strong>{{ group.market_price }}€</strong>.
+        The Supplier does <strong>not</strong> know this value.
+      </p>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">📣 Disclosure Decision</h5>
+    </div>
+    <div class="card-body">
+      <p>
+        Before the negotiation starts, you can communicate a Retail Price
+        to the Supplier. The Supplier is currently waiting for your decision.
+        Make your choice by clicking one of the following buttons:
+      </p>
+
+      <div class="d-flex gap-3 mb-3">
+        <button type="button" class="btn btn-primary btn-lg flex-fill"
+                id="btn-disclose-4">
+          Disclose 4
+        </button>
+        <button type="button" class="btn btn-primary btn-lg flex-fill"
+                id="btn-disclose-5">
+          Disclose 5
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-lg flex-fill"
+                id="btn-disclose-none">
+          No Disclosure
+        </button>
+      </div>
+
+      {# Hidden form fields, filled by the button handlers below and saved
+         through the normal oTree form submission. #}
+      <input type="hidden" name="disclosure_choice"
+             id="id_disclosure_choice" value="">
+      <input type="hidden" name="disclosed_value"
+             id="id_disclosed_value" value="">
+
+      <p class="text-muted mb-0">
+        <small>
+          If you click <em>Disclose 4</em> or <em>Disclose 5</em>, the
+          Supplier will be shown that value as your Retail Price -- whether
+          or not it is your actual RP. If you click <em>No Disclosure</em>,
+          the Supplier is told that you chose not to disclose.
+        </small>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Each button fills the hidden form fields and submits the page.
+    // The true/own categorization sent here is provisional; the server
+    // re-derives it in before_next_page (disclosed value vs. the true RP).
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('form');
+      const choiceInput = document.getElementById('id_disclosure_choice');
+      const valueInput = document.getElementById('id_disclosed_value');
+
+      function submitDisclosure(value) {
+        if (value === null) {
+          choiceInput.value = js_vars.disclose_none;
+          valueInput.value = '';
+        } else {
+          choiceInput.value = (value === js_vars.market_price
+              ? js_vars.disclose_true : js_vars.disclose_own);
+          valueInput.value = value;
+        }
+        form.submit();
+      }
+
+      document.getElementById('btn-disclose-4')
+          .addEventListener('click', () => submitDisclosure(4));
+      document.getElementById('btn-disclose-5')
+          .addEventListener('click', () => submitDisclosure(5));
+      document.getElementById('btn-disclose-none')
+          .addEventListener('click', () => submitDisclosure(null));
+    });
+  </script>
+{% endblock %}

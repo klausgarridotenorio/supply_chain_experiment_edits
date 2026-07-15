@@ -1,0 +1,12 @@
+# Standard public oTree (the example repository used a custom institutional
+# fork; nothing in this template depends on it).
+otree>=6.0.0
+
+# LLM chat stack of the AI retailer (bot_llm.py): Ollama client + auth.
+ollama>=0.4
+httpx>=0.27
+
+# Optional fast path for reading offers out of chat messages (bot_llm.py
+# falls back to the LLM reader when spacy or its model is missing):
+#   pip install spacy && python -m spacy download en_core_web_sm
+# spacy>=3.7

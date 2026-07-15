@@ -1,0 +1,108 @@
+{#
+  Comprehension check page (shared by ComprehensionCheck1-5 via
+  template_name) -- copied from the example repository's
+  intro/ComprehensionCheck.html. The wrong-answer solution text arrives
+  through oTree's standard form-error alert (see pages error_message).
+#}
+{% block title %}
+  Comprehension Check {{ question_number }}/{{ total_questions }}
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    <!-- Error Messages -->
+    {% if form.comprehension_check.errors %}
+      <div class="alert alert-danger" role="alert">
+        {% for error in form.comprehension_check.errors %}
+        {{ error }}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Progress Indicator -->
+  <div class="mb-4">
+    <h4 class="text-center">Comprehension Check</h4>
+    <p class="text-center text-muted">Question {{ question_number }} of {{ total_questions }}</p>
+  </div>
+
+  <!-- Role Information Card -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header border-bottom">
+      <h5 class="mb-0">📋 Your Role Information</h5>
+    </div>
+    <div class="card-body">
+      <p class="lead mb-0">
+        You are a <strong>{{ player.role }}</strong>
+        {% if player.role == C.ROLE_RETAILER_EMPLOYEE %}
+          with a Retail Price of <span class="badge bg-light text-dark border fs-6">{{ market_price }}</span>
+        {% else %}
+          with a Production Cost of <span class="badge bg-light text-dark border fs-6">{{ production_cost }}</span>
+        {% endif %}
+      </p>
+    </div>
+  </div>
+
+  <!-- Scenario Card -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header border-bottom">
+      <h5 class="mb-0">🤝 Negotiation Outcome</h5>
+    </div>
+    <div class="card-body">
+      <p class="mb-3">You reached a binding agreement with the following terms:</p>
+      <ul class="list-unstyled">
+        <li class="mb-2">📊 <strong>Wholesale Price (w):</strong> <span class="badge bg-light text-dark border">{{ price }}</span></li>
+        <li class="mb-2">📦 <strong>Quantity (q):</strong> <span class="badge bg-light text-dark border">{{ quantity }}</span></li>
+        <li class="mb-2">👥 <strong>Actual Demand:</strong> <span class="badge bg-light text-dark border">{{ demand }}</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Question Card -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header border-bottom">
+      <h5 class="mb-0">❓ Calculate Your Profit</h5>
+    </div>
+    <div class="card-body">
+      <p class="lead">
+        Given the agreement above and the actual demand of <strong>{{ demand }}</strong>,
+        what is your total profit from this deal?
+      </p>
+
+      <div class="alert alert-info" role="alert">
+        <strong>💡 Tip:</strong> Refer to the profit formula in the instructions page to calculate your answer.
+      </div>
+
+      <label for="comprehension_check" class="form-label fw-bold">Your Profit:</label>
+      <input
+        name="comprehension_check"
+        id="comprehension_check"
+        type="text"
+        inputmode="decimal"
+        class="form-control form-control-lg"
+        required
+        value=""
+        placeholder="Enter profit as a number (e.g., 150)">
+    </div>
+  </div>
+
+  {% next_button %}
+</div>
+
+<style>
+  .card {
+    border-radius: 8px;
+  }
+  .card-header {
+    border-radius: 8px 8px 0 0 !important;
+    font-weight: 600;
+  }
+  .badge {
+    font-size: 1rem;
+    padding: 0.5em 0.75em;
+  }
+  #comprehension_check:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  }
+</style>
+{% endblock %}

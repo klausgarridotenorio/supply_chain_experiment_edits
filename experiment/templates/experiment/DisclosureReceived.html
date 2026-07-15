@@ -1,0 +1,35 @@
+{#
+  Second disclosure page (Supplier only): shows what the Retailer disclosed
+  about the Retail Price (or that nothing was disclosed). The Retailer waits
+  on the NegotiationWaitPage while the Supplier reads this.
+#}
+{% block title %}
+  Disclosure from the Retailer
+{% endblock %}
+
+{% block content %}
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">📣 The Retailer's Disclosure</h5>
+    </div>
+    <div class="card-body">
+      <p>
+        Before this negotiation, the Retailer could communicate their Retail
+        Price <strong>(RP)</strong> to you.
+      </p>
+      {% if group.disclosure_message %}
+        <div class="alert alert-info mb-0">
+          {% group.disclosure_message %}
+        </div>
+      {% else %}
+        <div class="alert alert-secondary mb-0">
+          The Retailer chose not to disclose their Retail Price (RP).
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <p>Click Next to enter the negotiation.</p>
+
+  {% next_button %}
+{% endblock %}
