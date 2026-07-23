@@ -452,6 +452,14 @@ class Negotiation(Page):
                 async for response in \
                         player.other.receive_chat_from_human(data['body']):
                     yield {player.id_in_group: response}
+                    # The AI's binding (counter-)offers reset the clock
+                    # exactly like a human's interface offers, so the
+                    # human always has time to CONFIRM a late bot offer.
+                    if 'offers' in response \
+                            and Negotiation._reset_timer_if_needed(player):
+                        yield {idx: {'timer_reset':
+                                     Negotiation.TIMER_RESET_SECONDS}
+                               for idx in player.live_ids}
 
         elif data['type'] == 'propose':
             price, quantity = data['price'], data['quantity']
@@ -464,6 +472,12 @@ class Negotiation(Page):
                 async for response in \
                         player.other.receive_offer_from_human(price, quantity):
                     yield {player.id_in_group: response}
+                    # Same clock-reset rule for the AI's counter-offers.
+                    if 'offers' in response \
+                            and Negotiation._reset_timer_if_needed(player):
+                        yield {idx: {'timer_reset':
+                                     Negotiation.TIMER_RESET_SECONDS}
+                               for idx in player.live_ids}
 
         elif data['type'] == 'accept':
             player.process_accept(data['price'], data['quantity'])
