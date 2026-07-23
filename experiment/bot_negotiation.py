@@ -89,16 +89,35 @@ class NegotiationBot(BotStrategy):
         if not self.player.chat_data:
             yield self._say(PROMPTS['first_message'])
 
+    def _recent_context(self, body: str) -> list[dict[str, Any]]:
+        """Conversation context for the classifier: the last 3 exchanged
+        messages plus the bot's last line (if older than those), excluding
+        the message currently being processed (pages.py stores it in
+        chat_data BEFORE the bot runs)."""
+        history = list(self.player.chat_data)
+        if history and history[-1].get('body') == body \
+                and '(Me)' in history[-1].get('nick', ''):
+            history = history[:-1]
+        recent = history[-3:]
+        bot_lines = [m for m in history if '(Me)' not in m.get('nick', '')]
+        if bot_lines and bot_lines[-1] not in recent:
+            recent = [bot_lines[-1]] + recent
+        return recent
+
     async def receive_chat_from_human(self, body: str) \
             -> AsyncIterator[dict[str, Any]]:
-        """A chat message: classify it first (bot_guard -- widget-only
-        scope, verbal acceptances), then read a possible offer out of the
-        natural language (spacy fast path, then the offer-reader LLM) and
-        evaluate. Incomplete/absent terms flow into the NOT_OFFER guidance
-        reply."""
+        """A chat message: classify it first IN CONTEXT (bot_guard --
+        widget-only scope, verbal acceptances, short answers to the bot's
+        own questions), then read a possible offer out of the natural
+        language (spacy fast path, then the offer-reader LLM) and
+        evaluate. Terms the reader misses but the context-aware classifier
+        caught (e.g. a bare "25" answering a quantity question) are
+        backfilled. Incomplete/absent terms flow into the NOT_OFFER
+        guidance reply."""
         self.user_message = body
 
-        verdict = await classify_message(self, body)
+        verdict = await classify_message(self, body,
+                                         self._recent_context(body))
         if verdict is not None:
             # Off-topic requests and non-widget goods: fixed refusal, the
             # generation LLM never sees the message.
@@ -126,6 +145,18 @@ class NegotiationBot(BotStrategy):
 
         offer = await self.interpret_offer(body,
                                            idx=self.player.id_in_group)
+
+        # Backfill terms the reader missed but the context-aware
+        # classifier extracted (short contextual answers like "25").
+        if verdict is not None and not offer.is_complete:
+            price = offer.price if offer.price is not None \
+                else verdict['price']
+            quantity = offer.quantity if offer.quantity is not None \
+                else verdict['quantity']
+            if (price, quantity) != (offer.price, offer.quantity):
+                offer = Offer(idx=self.player.id_in_group, from_chat=True,
+                              price=price, quantity=quantity)
+
         if offer.is_complete:
             self.offer_list.append(offer)
         async for payload in self.evaluate_and_respond(offer):

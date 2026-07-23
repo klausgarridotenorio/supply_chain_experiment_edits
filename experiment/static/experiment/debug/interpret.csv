@@ -207,3 +207,107 @@ CLEANED **Proposed Wholesale Price:** 2.80€
         Output: [2.80€, 75]
 P / Q   2.8 75
 
+MESSAGE hi how about a low quantity 
+CLEANED [,]
+P / Q   None None
+
+MESSAGE I understand you're looking for a low quantity. However, before we discuss that, could you please suggest a specific wholesale price that would work for you?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE how about a price of 3
+CLEANED [3.00€,]
+P / Q   3.0 None
+
+MESSAGE 2.80€ and 75 units.
+CLEANED **Proposed Wholesale Price:** 2.80€
+        **Proposed Quantity:** 75
+        Output: `[2.80€, 75]`
+P / Q   2.8 75
+
+MESSAGE Price of 2.87€ and quantity of 100].
+CLEANED **Proposed Wholesale Price:** 2.87€
+        **Proposed Quantity:** 100
+        Output: `[2.87€, 100]`
+P / Q   2.87 100
+
+MESSAGE how about a price of 2.88
+CLEANED [2.88€,]
+P / Q   2.88 None
+
+MESSAGE I understand your concern for the previous offer, but I think we can find a better balance between price and quantity. How about a price of 2.80€ and quantity of 75?
+CLEANED [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE price of 2.88
+CLEANED **Proposed Wholesale Price:** 2.88€
+        **Proposed Quantity:** []
+        Output: `[2.88€,]`
+P / Q   2.88 None
+
+MESSAGE price of 2.80€ and quantity of 75.
+CLEANED **Proposed Wholesale Price:** 2.80€
+        **Proposed Quantity:** 75
+        Output: `[2.80€, 75]`
+P / Q   2.8 75
+
+MESSAGE no no 2.9
+CLEANED **Proposed Wholesale Price:** 2.90€
+        **Proposed Quantity:** []
+        Output: `[2.90€, ]`
+P / Q   2.9 None
+
+MESSAGE price of 2.80€ and quantity of 75.
+CLEANED **Proposed Wholesale Price:** 2.80€
+        **Proposed Quantity:** 75
+        Output: `[2.80€, 75]`
+P / Q   2.8 75
+
+MESSAGE quanity of 20
+CLEANED [,,]
+P / Q   None None
+
+MESSAGE I understand you're looking at a quantity of 20. How about a wholesale price of 2.80€ for a quantity of 75 units?
+CLEANED **Proposed Wholesale Price:** 2.80€
+        **Proposed Quantity:** 75
+        Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE what is the minimum quanity you can do
+CLEANED [,]
+P / Q   None None
+
+MESSAGE What specific quantity do you have in mind?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE quantity of 25
+CLEANED **Proposed Wholesale Price:** € (no price proposed)
+        **Proposed Quantity:** 25
+        Output: [,25]
+P / Q   None 25
+
+MESSAGE I understand you're looking at a quantity of 25. How about a wholesale price of 1.42€ for a quantity of 25 units?
+CLEANED **Proposed Wholesale Price:** 1.42€
+        **Proposed Quantity:** 25
+        Output: [1.42€, 25]
+P / Q   1.42 25
+
+MESSAGE 25
+CLEANED **Invalid Input**: The input "25" does not contain any information about a proposed wholesale price or quantity. Therefore, I will output an empty list `[,]`.
+P / Q   None None
+
+MESSAGE I understand your suggestion of 25 units. How about a wholesale price of 2.15€ for a quantity of 25?
+CLEANED [2.15€, 25]
+P / Q   2.15 25
+
+MESSAGE I understand your suggestion of 25 units. How about a wholesale price of 1.42€ for a quantity of 25?
+CLEANED [1.42€, 25]
+P / Q   1.42 25
+
+MESSAGE 2.50 for 60
+CLEANED **Proposed Wholesale Price:** €2.50
+        **Proposed Quantity:** 60
+        Output: `[2.50€, 60]`
+P / Q   2.5 60
+

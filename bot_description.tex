@@ -1,0 +1,131 @@
+\subsubsection*{The AI Retailer (Single-Player Game)}
+
+The bot is a \textbf{hybrid}: a deterministic economic solver makes every
+\textit{decision}, while a \textbf{llama3} model served via Ollama (remote
+hosts from the session config, with the local instance as failover) writes
+the natural-language chat, and a dedicated \textit{offer-reader} model
+(config key \texttt{llm\_reader}) extracts offers out of the human's
+free-text messages.
+
+\paragraph*{1. The setting}
+A contract is a wholesale price $w \in [1,5]$\,€ (two decimals) and a
+quantity $q \in \{1,\dots,100\}$ of widgets. Demand is $D \sim U[0,100]$
+and expected sales for an order of $q$ are
+$$ ES(q) \;\equiv\; E[\min(q,D)] \;=\; \frac{q(200-q)}{200}. $$
+Expected profits (the Supplier carries the inventory risk):
+\begin{itemize}
+    \item Supplier: $\pi_S = w \cdot ES(q) - PC \cdot q$
+    \item Retailer: $\pi_R = (RP - w) \cdot ES(q)$
+\end{itemize}
+
+Crucially, the bot's entire strategy runs on its \textbf{acting retail
+price} --- the value it disclosed to the human, or the no-disclosure
+fallback of 4€ --- never the true draw
+(\texttt{bot\_acting\_market\_price}; the ``no full information'' design).
+
+\paragraph*{2. The benchmark: Nash bargaining solution (\texttt{optimal.py})}
+With $RP$ and $PC$, the symmetric even-split offer is:
+$$ w^* = \frac{RP(RP + 3PC)}{2(RP + PC)}, \qquad
+   q^* = 100\cdot\frac{RP - PC}{RP}
+   \text{ (rounded to the total-profit-maximizing integer)} $$
+
+The bot's \textbf{target profit} $\Pi^*$ is the supplier profit at
+$(w^*, q^*)$, floored to two decimals. For $RP=4, PC=1$: $w^*=2.80$,
+$q^*=75$, $\Pi^* = 56.25$.
+
+\paragraph*{3. Offer evaluation (\texttt{offer.py})}
+Every incoming offer (chat or interface) is classified:
+\begin{itemize}
+    \item \textbf{ACCEPT} iff the bot's own expected profit meets the
+    target: $(RP - w)\cdot ES(q) \ge \Pi^*$.
+    \item Otherwise, two \textbf{feasibility} tests diagnose what's wrong:
+    \begin{itemize}
+        \item \textbf{Price feasible} iff even at $q=100$ the bot could
+        still hit the target: $(RP - w)\cdot ES(100) \ge \Pi^* \iff
+        w \le RP - \Pi^*/50$. At $RP=4$: $w \le 2.875$, so the
+        \textbf{price cap} is 2.87€.
+        \item \textbf{Quantity feasible} iff some allowed price still hits
+        the target at that $q$: $RP - \Pi^*/ES(q) \ge PC$. At $RP=4$ this
+        requires $ES(q) \ge 18.75$, i.e. $q \ge 21$ --- the
+        \textbf{minimum workable quantity} is 21 units.
+    \end{itemize}
+    \item Both fail $\rightarrow$ \texttt{NOT\_PROFITABLE\_ON\_BOTH};
+    only price $\rightarrow$ \texttt{\_ON\_PRICE}; only quantity
+    $\rightarrow$ \texttt{\_ON\_QUANTITY}.
+    \item Out-of-range terms $\rightarrow$ \texttt{INVALID\_OFFER}; no
+    readable terms $\rightarrow$ \texttt{NOT\_OFFER}.
+\end{itemize}
+
+\paragraph*{4. Mathematical answers to partial offers}
+A chat message naming only one term becomes a partial offer, and the bot
+\textbf{completes} it at its target profit:
+\begin{itemize}
+    \item \textbf{Quantity-only (``quantity 70'')} $\rightarrow$
+    \texttt{OFFER\_QUANTITY} if $q \ge 21$. The bot keeps $q$ and solves
+    $(RP - w)\cdot ES(q) = \Pi^*$ for the \textbf{highest} price it can
+    grant, floored to cents:
+    $$ w = \left\lfloor \left(RP - \frac{\Pi^*}{ES(q)}\right)\cdot 100
+       \right\rfloor / 100 $$
+    Examples at $RP=4$: $q=70 \Rightarrow ES=45.5 \Rightarrow w = 2.76$;
+    $q=40 \Rightarrow 2.24$; $q=30 \Rightarrow 1.79$. Note this is
+    \textbf{generous to the supplier}: any lower price also works for the
+    bot, but it anchors on the boundary price.
+
+    \item \textbf{Price-only (``how about 2.50?'')} $\rightarrow$
+    \texttt{OFFER\_PRICE} if $w \le 2.87$. The bot keeps $w$ and picks the
+    quantity that (1) satisfies its target and (2) \textbf{maximizes the
+    supplier's profit} among candidates (total profit as tie-break). The
+    feasible band comes from the quadratic
+    $(RP-w)\cdot\frac{q(200-q)}{200} \ge \Pi^*$, whose roots are:
+    $$ q_{\pm} = 100 \pm \sqrt{10000 - \frac{200\,\Pi^*}{RP - w}} $$
+    Candidates are integers around $q_-$, $q_+$ (clamped to $[0,100]$) and
+    around the retailer's vertex $q=100$; among the feasible ones it
+    returns $\arg\max_q\, w\cdot ES(q) - PC\cdot q$. Examples:
+    $w=2.50 \Rightarrow q=52$; $w=2.87 \Rightarrow q=94$.
+
+    \item \textbf{Infeasible partials} ($q<21$, or $w>2.87$) $\rightarrow$
+    treated as \texttt{NOT\_PROFITABLE\_ON\_BOTH} $\rightarrow$ the bot
+    \textbf{anchors its counter on the Nash offer itself} (2.80€, 75).
+    Same for unreadable messages (\texttt{NOT\_OFFER}). Invalid
+    (out-of-range) offers get a reminder of the allowed ranges with no
+    counter anchor. Complete-but-unprofitable offers use the same two
+    solvers: the failing term is replaced while the workable term the
+    human proposed is kept.
+\end{itemize}
+
+\paragraph*{5. The pipeline around the math}
+Per chat message:
+\begin{enumerate}
+    \item \textbf{Guard classification} (\texttt{bot\_guard.py}, llama3),
+    \textbf{context-aware}: the classifier sees the last three exchanged
+    messages plus the bot's last line, so short contextual answers (a bare
+    ``25'' after the bot asked for a quantity) are read as partial offers
+    rather than noise, and their terms are backfilled if the offer reader
+    misses them. Off-topic requests and non-widget goods $\rightarrow$
+    fixed refusal line; verbal acceptances (``ok, deal'') $\rightarrow$
+    scripted pointer to the CONFIRM button.
+    \item \textbf{Offer reading}: spacy fast path, then the offer-reader
+    Ollama model extracting [price, quantity] (range outputs like
+    ``60--85'' resolve to the Nash terms when they contain them).
+    \item \textbf{Decision} --- accept or reject, and the anchor terms of
+    any counter --- by the math above, never by the LLM.
+    \item \textbf{Reply generation} (\texttt{bot\_strategy.py}): llama3
+    writes up to 3 candidate replies with the solver's anchor terms
+    embedded in the prompt; each candidate is scrubbed, linted (no closure
+    claims, no wrong-direction price talk, no code), and its offer is
+    \textbf{read back out} and re-evaluated --- sent only if the read-back
+    offer meets the bot's profit target, otherwise best-of-batch among
+    lint-clean drafts, otherwise the solver-scripted fallback line. The
+    binding counter posted to the interface is the offer read back out of
+    the sent message. Accepted chat offers are re-posted as a binding
+    interface offer for the human to CONFIRM; accepted interface offers
+    close the deal directly.
+\end{enumerate}
+
+One asymmetry worth knowing when reading transcripts: the solver's anchor
+terms always sit exactly \textbf{on} the bot's profit-target boundary ---
+the supplier-favoring choice within that boundary is deliberate (it
+maximizes the human's profit subject to the bot's target). The generated
+reply may state terms that deviate from the anchor, but the read-back
+validation only lets it deviate \textbf{above} the boundary (profit
+$\ge \Pi^*$), never below.
