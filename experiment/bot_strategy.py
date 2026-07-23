@@ -33,6 +33,7 @@ import asyncio
 import random
 from typing import Any, AsyncIterator
 
+from .bot_guard import lint_problems, scrub_text
 from .bot_llm import BotLLM
 from .constants import C
 from .offer import Offer, OfferList, Evaluation
@@ -185,8 +186,18 @@ class BotStrategy(BotLLM):
             response = await self.get_llm_response(content)
             log_debug('[BotStrategy._respond_to_offer] raw:',
                       response['message']['content'])
-            llm_output = self.extract_content(response)
+            llm_output = scrub_text(self.extract_content(response))
             log_debug('[BotStrategy._respond_to_offer] cleaned:', llm_output)
+
+            # Guard lints (bot_guard): a draft with closure claims,
+            # wrong-direction price language, or code is never sendable.
+            problems = lint_problems(llm_output, evaluation)
+            if problems:
+                log_debug('[BotStrategy._respond_to_offer] linted:',
+                          problems)
+                llm_offers.append(
+                    (float('-inf'), llm_output, Offer(idx=C.BOT_ID)))
+                continue
 
             last_offer = await self._interpret_offer_llm(llm_output, C.BOT_ID)
             if last_offer.is_complete:
@@ -208,10 +219,17 @@ class BotStrategy(BotLLM):
             llm_offers.append(
                 (last_offer['profit_bot'], llm_output, last_offer))
 
-        # No self-profitable candidate after 3 attempts: best of the batch.
-        best_profit = max(candidate[0] for candidate in llm_offers)
+        # No self-profitable candidate after 3 attempts: best of the batch,
+        # excluding drafts the guard lints rejected. If every draft was
+        # linted away, raise so the caller uses the solver-scripted
+        # fallback instead of showing a rule-violating message.
+        viable = [candidate for candidate in llm_offers
+                  if candidate[0] > float('-inf')]
+        if not viable:
+            raise RuntimeError('all LLM drafts failed the guard lints')
+        best_profit = max(candidate[0] for candidate in viable)
         _, llm_output, last_offer = random.choice(
-            [candidate for candidate in llm_offers
+            [candidate for candidate in viable
              if candidate[0] == best_profit])
         return llm_output, (last_offer if last_offer.is_complete else None)
 
@@ -245,7 +263,9 @@ class BotStrategy(BotLLM):
 
         try:
             response = await self.get_llm_response(prompt)
-            text = self.extract_content(response)
+            text = scrub_text(self.extract_content(response))
+            if not text:
+                text = fallback
         except Exception as exc:
             log_debug('[BotStrategy] LLM unavailable on accept:', repr(exc))
             text = fallback

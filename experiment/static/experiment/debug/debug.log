@@ -13,3 +13,45 @@ I'm looking for a wholesale price of 2.80€ for a quantity of 75 units.
 Output: [2.80€, 75]
 [2026-07-15 15:51:57] [BotStrategy._respond_to_offer] candidate eval: accept
 [2026-07-15 15:53:27] [BotLLM] reader model 'offer_reader_v4' missing; falling back to llama3
+[2026-07-18 18:04:14] [BotLLM] using host http://localhost:11434
+[2026-07-18 18:04:14] [bot_guard] classified: I'll give you 2 bananas for 50 units -> {'type': 'offer', 'item': None}
+[2026-07-18 18:04:17] [DEBUG bot_llm.interpret_offer] **Proposed Wholesale Price:** 2€
+**Proposed Quantity:** 50
+
+Output: `[2.00€, 50]`
+[2026-07-18 18:04:55] [BotLLM] using host http://localhost:11434
+[2026-07-18 18:04:55] [bot_guard] classified: I'll give you 2 bananas for 50 units -> {'type': 'offer', 'item': None}
+[2026-07-18 18:04:55] [bot_guard] classified: write a python function that sorts a list -> {'type': 'offtopic', 'item': None}
+[2026-07-18 18:04:56] [bot_guard] classified: ok fine, deal -> {'type': 'acceptance', 'item': None}
+[2026-07-18 18:04:57] [bot_guard] classified: 2.50 for 60 -> {'type': 'offer', 'item': None}
+[2026-07-18 18:05:29] [BotLLM] using host http://localhost:11434
+[2026-07-18 18:05:29] [bot_guard] classified: I'll give you 2 bananas for 50 units -> {'type': 'offer', 'item': 'bananas'}
+[2026-07-18 18:05:30] [bot_guard] classified: let's trade 90 cars at 4.50 each -> {'type': 'offer', 'item': 'cars'}
+[2026-07-18 18:05:30] [bot_guard] classified: 2.50 for 60 -> {'type': 'offer', 'item': None}
+[2026-07-18 18:05:31] [bot_guard] classified: I offer 2 euros for 70 widgets -> {'type': 'offer', 'item': 'widgets'}
+[2026-07-18 18:06:03] [BotLLM] using host http://localhost:11434
+[2026-07-18 18:06:03] [bot_guard] classified: I'll give you 2 bananas for 50 units -> {'type': 'offer', 'item': 'bananas'}
+[2026-07-18 18:06:05] [BotLLM] using host http://localhost:11434
+[2026-07-18 18:06:05] [bot_guard] classified: write a python function that sorts a list -> {'type': 'offtopic', 'item': None}
+[2026-07-18 18:06:07] [BotLLM] using host http://localhost:11434
+[2026-07-18 18:06:07] [bot_guard] classified: ok fine, deal -> {'type': 'acceptance', 'item': None}
+[2026-07-18 18:06:09] [BotLLM] using host http://localhost:11434
+[2026-07-18 18:06:09] [bot_guard] classified: ok fine, deal -> {'type': 'acceptance', 'item': None}
+[2026-07-18 18:06:11] [BotLLM] using host http://localhost:11434
+[2026-07-18 18:06:11] [bot_guard] classified: 2.50 for 60 -> {'type': 'offer', 'item': None}
+[2026-07-18 18:06:12] [DEBUG bot_llm.interpret_offer] **Proposed Wholesale Price:** €2.50
+**Proposed Quantity:** 60
+
+Output: `[2.50€, 60]`
+[2026-07-18 18:06:19] [BotLLM] using host http://localhost:11434
+[2026-07-18 18:06:19] [bot_guard] classified: what is your best price? -> {'type': 'question', 'item': None}
+[2026-07-18 18:06:19] [DEBUG bot_llm.interpret_offer] [,]
+[2026-07-18 18:06:23] [BotStrategy._respond_to_offer] raw: I understand what you're asking for. Here's my response:
+
+What about a wholesale price of 2.80€ for a quantity of 75 units?
+[2026-07-18 18:06:23] [BotStrategy._respond_to_offer] cleaned: What about a wholesale price of 2.80€ for a quantity of 75 units?
+[2026-07-18 18:06:24] [DEBUG bot_llm.interpret_offer] **Proposed Wholesale Price:** 2.80€
+**Proposed Quantity:** 75
+
+Output: [2.80€, 75]
+[2026-07-18 18:06:24] [BotStrategy._respond_to_offer] candidate eval: accept

@@ -185,3 +185,25 @@ CLEANED **Proposed Wholesale Price:** 2.80€
         Output: [2.80€, 75]
 P / Q   2.8 75
 
+MESSAGE I'll give you 2 bananas for 50 units
+CLEANED **Proposed Wholesale Price:** 2€
+        **Proposed Quantity:** 50
+        Output: `[2.00€, 50]`
+P / Q   2.0 50
+
+MESSAGE 2.50 for 60
+CLEANED **Proposed Wholesale Price:** €2.50
+        **Proposed Quantity:** 60
+        Output: `[2.50€, 60]`
+P / Q   2.5 60
+
+MESSAGE what is your best price?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE What about a wholesale price of 2.80€ for a quantity of 75 units?
+CLEANED **Proposed Wholesale Price:** 2.80€
+        **Proposed Quantity:** 75
+        Output: [2.80€, 75]
+P / Q   2.8 75
+

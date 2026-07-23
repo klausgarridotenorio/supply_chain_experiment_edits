@@ -19,8 +19,11 @@ Chat generation and offer reading run on the repository's Ollama stack
 offer-reader model (Ollama_LLMs/Modelfile_reader_of_offers_v3) reads
 offers out of the human's natural-language chat.
 """
+import asyncio
 from typing import Any, AsyncIterator
 
+from .bot_guard import (ACCEPT_POINTER, ACCEPT_POINTER_NO_OFFER,
+                        REFUSAL_LINE, classify_message, widget_like)
 from .bot_strategy import BotStrategy, FALLBACK_OFFER_STRING
 from .constants import C
 from .offer import Offer, OfferList
@@ -88,11 +91,39 @@ class NegotiationBot(BotStrategy):
 
     async def receive_chat_from_human(self, body: str) \
             -> AsyncIterator[dict[str, Any]]:
-        """A chat message: read a possible offer out of the natural
-        language (spacy fast path, then the offer-reader LLM), then
-        evaluate. Incomplete/absent terms flow into the NOT_OFFER
-        guidance reply."""
+        """A chat message: classify it first (bot_guard -- widget-only
+        scope, verbal acceptances), then read a possible offer out of the
+        natural language (spacy fast path, then the offer-reader LLM) and
+        evaluate. Incomplete/absent terms flow into the NOT_OFFER guidance
+        reply."""
         self.user_message = body
+
+        verdict = await classify_message(self, body)
+        if verdict is not None:
+            # Off-topic requests and non-widget goods: fixed refusal, the
+            # generation LLM never sees the message.
+            if verdict['type'] == 'offtopic' or (
+                    verdict['type'] == 'offer'
+                    and not widget_like(verdict['item'])):
+                await asyncio.sleep(C.BOT_RESPONSE_DELAY)
+                yield self._say(REFUSAL_LINE)
+                return
+
+            # Verbal acceptance is never binding: scripted pointer to the
+            # CONFIRM button (can never misstate the deal state).
+            if verdict['type'] == 'acceptance':
+                await asyncio.sleep(C.BOT_RESPONSE_DELAY)
+                bot_offers = [o for o in self.offer_list
+                              if o.idx == C.BOT_ID]
+                if bot_offers:
+                    last = bot_offers[-1]
+                    terms = FALLBACK_OFFER_STRING % (last['price'],
+                                                     last['quantity'])
+                    yield self._say(ACCEPT_POINTER % terms)
+                else:
+                    yield self._say(ACCEPT_POINTER_NO_OFFER)
+                return
+
         offer = await self.interpret_offer(body,
                                            idx=self.player.id_in_group)
         if offer.is_complete:
