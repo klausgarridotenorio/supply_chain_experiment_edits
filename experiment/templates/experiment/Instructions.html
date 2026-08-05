@@ -127,7 +127,7 @@
     </div>
     <div class="card-body">
       <p class="mb-0">
-        Your goal is to agree on a Wholesale Price <strong>(w)</strong> and
+        Your goal is to negotiate a Wholesale Price <strong>(w)</strong> and
         Quantity <strong>(q)</strong> maximizing your profits.
       </p>
     </div>
@@ -147,7 +147,8 @@
         </li>
         <li>
           <strong>Wholesale Price (w)</strong>
-          is denoted in euros (€) with two decimals.
+          is denoted in euros (€), between €{{ C.PRICE_MIN }}.00 and
+          €{{ C.PRICE_MAX }}.00, with two decimals.
         </li>
       </ul>
     </div>
@@ -169,13 +170,10 @@
       <div class="example-box">
         <ul class="mb-0">
           <li>
-            Demand (D) is 75: 3 * min(50, 75) - 1 * 50 = €100
-          </li>
-          <li>
             Demand (D) is 25: 3 * min(50, 25) - 1 * 50 = €25
           </li>
           <li>
-            Demand (D) is 50: 3 * min(50, 50) - 1 * 50 = €100
+            Demand (D) is 75: 3 * min(50, 75) - 1 * 50 = €100
           </li>
         </ul>
       </div>
@@ -257,9 +255,10 @@
           €{{ formatted_baseline }}</strong> for participating.
         </li>
         <li>
-          On top of that, you earn a bonus of
+          On top of that, your bonus depends on any potential deal you
+          strike: you earn
           <strong>{{ profit_share_pct }}% of your realized profit</strong>
-          from the deal, computed <strong>after the demand is drawn</strong>
+          from that deal, computed <strong>after the demand is drawn</strong>
           (Supplier: w * min(q, D) - PC * q; Retailer: (RP - w) * min(q, D),
           where RP includes the quality-check increases).
         </li>
