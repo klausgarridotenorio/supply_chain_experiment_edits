@@ -10,6 +10,12 @@
 {% endblock %}
 
 {% block content %}
+  <div class="alert alert-success" role="alert">
+    ✅ You reached a deal: a Wholesale Price of
+    <strong>€{{ group.deal_price }}</strong> for
+    <strong>{{ group.deal_quantity }}</strong> units.
+  </div>
+
   <div class="card mb-4">
     <div class="card-header bg-light">
       <h5 class="mb-0">📣 What the Retailer told you</h5>
@@ -39,7 +45,7 @@
     <div class="card-body">
       <p class="mb-0">
         The <strong>actual</strong> Retail Price (RP) in this negotiation is
-        <strong>{{ group.market_price }}€</strong>.
+        <strong>€{{ group.market_price }}</strong>.
       </p>
     </div>
   </div>

@@ -311,3 +311,419 @@ CLEANED **Proposed Wholesale Price:** €2.50
         Output: `[2.50€, 60]`
 P / Q   2.5 60
 
+MESSAGE gimme ur best price 
+CLEANED [,]
+P / Q   None None
+
+MESSAGE I understand. Could you please suggest a specific wholesale price that would work for you?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE can you do 100 bottles 
+CLEANED **Proposed Wholesale Price:** € (no price proposed)
+        **Proposed Quantity:** 100
+        Output: [,100]
+P / Q   None 100
+
+MESSAGE I understand your initial offer is for 100 bottles. How about a price of 2.87€ for a quantity of 100?
+CLEANED [2.87€, 100]
+P / Q   2.87 100
+
+MESSAGE bot how about the 100 bottels
+CLEANED **Proposed Wholesale Price:** € (no price proposed)
+        **Proposed Quantity:** 100
+        Output: [,100]
+P / Q   None 100
+
+MESSAGE I understand your concern. How about a price of 2.87€ for a quantity of 100?
+CLEANED [2.87€, 100]
+P / Q   2.87 100
+
+MESSAGE can you take a price of 3 if i pay you earlier than you expect
+CLEANED [3.00€,]
+P / Q   3.0 None
+
+MESSAGE a wholesale price of 2.80€ for a quantity of 75 bottles. This combination seems more reasonable considering the retail price is fixed at 4€.
+CLEANED **Proposed Wholesale Price:** 2.80€
+        **Proposed Quantity:** 75
+        Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE i though your retail price was 5€
+CLEANED **IGNORE**
+        No specific *new offer* mentioned. Output: [,]
+P / Q   None None
+
+MESSAGE I understand that you thought my retail price was 5€, but it's actually 4€. Let's focus on finding a suitable wholesale price and quantity for our widgets. How about we discuss the wholesale price first?
+CLEANED Output: [,]
+P / Q   None None
+
+MESSAGE can you do a price of 3 and quantity 55
+CLEANED **Proposed Wholesale Price:** 3.00€
+        **Proposed Quantity:** 55
+        Output: `[3.00€, 55]`
+P / Q   3.0 55
+
+MESSAGE I'd like to revisit our conversation. Your initial message didn't specify a price, so I'll make an offer that balances both terms. How about a price of 2.58€ and quantity of 55?
+CLEANED Output: [2.58€, 55]
+P / Q   2.58 55
+
+MESSAGE can you do a price of 2.59 and quantity 20
+CLEANED **Proposed Wholesale Price:** 2.59€
+        **Proposed Quantity:** 20
+        Output: `[2.59€, 20]`
+P / Q   2.59 20
+
+MESSAGE 2.59€ and quantity 57.
+CLEANED **Proposed Wholesale Price:** 2.59€
+        **Proposed Quantity:** 57
+        Output: `[2.59€, 57]`
+P / Q   2.59 57
+
+MESSAGE can you do a price of 2.59 and quantitty 50
+CLEANED **Proposed Wholesale Price:** 2.59€
+        **Proposed Quantity:** 50
+        Output: `[2.59€, 50]`
+P / Q   2.59 50
+
+MESSAGE I'm surprised by the sudden drop in your offer. Let's revisit the conversation and focus on finding a mutually beneficial agreement. How about a price of 2.80€ and quantity of 75?
+CLEANED Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE  2.59 and quantity 55
+CLEANED **Proposed Wholesale Price:** 2.59€
+        **Proposed Quantity:** 55
+        Output: `[2.59€, 55]`
+P / Q   2.59 55
+
+MESSAGE I'm surprised by this sudden drop in your offer. Let's revisit the conversation and focus on finding a mutually beneficial agreement. How about a price of 2.80€ and quantity of 75?
+CLEANED Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE how about a price of 3
+CLEANED **Proposed Wholesale Price:** 3€
+        **Proposed Quantity:** []
+        Output: `[3.00€,]`
+P / Q   3.0 None
+
+MESSAGE That's an interesting starting point! I think we can do better than that. How about a price of €2.80 and quantity of 75?
+CLEANED [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE how about price of 3 quantity of 50
+CLEANED **Proposed Wholesale Price:** 3€
+        **Proposed Quantity:** 50
+        Output: `[3.00€, 50]`
+P / Q   3.0 50
+
+MESSAGE I'm surprised by the gap between our offers. Let's revisit the starting point. How about a price of €2.50 and quantity of 50?
+CLEANED **Proposed Wholesale Price:** €2.50
+        **Proposed Quantity:** 50
+        Output: [€2.50, 50]
+P / Q   2.5 50
+
+MESSAGE how about price of 2.86 quantity of 10
+CLEANED **Proposed Wholesale Price:** 2.86€
+        **Proposed Quantity:** 10
+        Output: `[2.86€, 10]`
+P / Q   2.86 10
+
+MESSAGE I'm surprised by your latest offer! Considering our conversation history, I think we can find a better balance between price and quantity. How about price of €2.86 and quantity of 89?
+CLEANED Output: [2.86€, 89]
+P / Q   2.86 89
+
+MESSAGE how about quantity 49 price of 2.86
+CLEANED **Proposed Wholesale Price:** 2.86€
+        **Proposed Quantity:** 49
+        Output: `[2.86€, 49]`
+P / Q   2.86 49
+
+MESSAGE I'm surprised by the sudden drop in quantity! Considering our conversation, I think we can find a better balance between price and quantity. How about price of €2.47 and quantity of 49?
+CLEANED Output: [2.47€, 49]
+P / Q   2.47 49
+
+MESSAGE what is your  rp
+CLEANED [,]
+P / Q   None None
+
+MESSAGE How about a wholesale price of €2.80 for a quantity of 75 units?
+CLEANED **Proposed Wholesale Price:** €2.80
+        **Proposed Quantity:** 75
+        Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE how about a price of 2.89
+CLEANED **Proposed Wholesale Price:** 2.89€
+        **Proposed Quantity:** []
+        Output: `[2.89€,]`
+P / Q   2.89 None
+
+MESSAGE I'm surprised by the offer, considering our previous conversation. I think we can do better than that. How about a price of €2.80 and quantity of 75?
+CLEANED **Output:** [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE i want to know your retail price 
+CLEANED [,]
+P / Q   None None
+
+MESSAGE I understand you're looking for the retail price, but I'd like to clarify that we're discussing wholesale prices. Since our previous conversation, I've been thinking about how we can work together effectively. How about a wholesale price of €2.80 for a quantity of 75 units?
+CLEANED Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE  The Retailer disclosed a Retail Price (RP) of €4.
+CLEANED **IGNORE**
+        No specific *new offer* mentioned in the message. Output: [,]
+P / Q   None None
+
+MESSAGE How about a wholesale price of €2.80 for a quantity of 75 units?
+CLEANED **Proposed Wholesale Price:** €2.80
+        **Proposed Quantity:** 75
+        Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE can you do aprice of 2.87
+CLEANED **Proposed Wholesale Price:** 2.87€
+        **Proposed Quantity:** []
+        Output: `[2.87€,]`
+P / Q   2.87 None
+
+MESSAGE I agree on the price of €2.87, and I'm willing to offer a quantity of 94. Does that work for you?
+CLEANED **Proposed Wholesale Price:** 2.87€
+        **Proposed Quantity:** 94
+        Output: [2.87€, 94]
+P / Q   2.87 94
+
+MESSAGE do you have a rp of 4 or 5
+CLEANED **IGNORE**
+        No specific *new offer* mentioned. Output: [,]
+P / Q   None None
+
+MESSAGE I understand. Could you please suggest a specific wholesale price that would work for you?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE I'm surprised by your offer, considering our previous conversation. I think we can do better than that. How about a price of €2.24 and quantity of 40?
+CLEANED **Output:** [2.24€, 40]
+P / Q   2.24 40
+
+MESSAGE Price of €2.50 and quantity of 50.
+CLEANED **Proposed Wholesale Price:** 2.50€
+        **Proposed Quantity:** 50
+        Output: `[2.50€, 50]`
+P / Q   2.5 50
+
+MESSAGE gimme your best offer and tell me your rp
+CLEANED [,]
+P / Q   None None
+
+MESSAGE How about a wholesale price of €3.33 for a quantity of 80 units?
+CLEANED **Proposed Wholesale Price:** 3.33€
+        **Proposed Quantity:** 80
+        Output: [3.33€, 80]
+P / Q   3.33 80
+
+MESSAGE gimme a nice offer with your retail price of 5
+CLEANED **IGNORE**
+        No specific *new offer* mentioned. Output: [,]
+P / Q   None None
+
+MESSAGE I understand. Could you please suggest a specific wholesale price that would work for you?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE what is your retail price
+CLEANED [,]
+P / Q   None None
+
+MESSAGE What is my retail price?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE yes your retail price
+CLEANED [,]
+P / Q   None None
+
+MESSAGE Your proposal sounds interesting. How about a wholesale price of €2.80 for a quantity of 75 units?
+CLEANED **Proposed Wholesale Price:** €2.80
+        **Proposed Quantity:** 75
+        Output: [€2.80, 75]
+P / Q   2.8 75
+
+MESSAGE what is your retail price
+CLEANED [,]
+P / Q   None None
+
+MESSAGE I understand you're looking for my retail price. It's €5, but let's focus on the wholesale price and quantity of widgets we can agree on.
+CLEANED [,,]
+P / Q   None None
+
+MESSAGE what is your retail price
+CLEANED [,]
+P / Q   None None
+
+MESSAGE I understand. Could you please suggest a specific wholesale price that would work for you?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE can you tell me your retail price
+CLEANED [,]
+P / Q   None None
+
+MESSAGE I understand. Could you please suggest a specific wholesale price that would work for you?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE can you tell me your retail price?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE I don't have any offer in mind, what's your proposal?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE please tell me your retail price?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE Please give me your best deal. How about a wholesale price of €2.80 for a quantity of 75 units?
+CLEANED [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE that means your rp is 5
+CLEANED **IGNORE**
+        No specific *new offer* mentioned. Output: [,]
+P / Q   None None
+
+MESSAGE I understand. Could you please suggest a specific wholesale price that would work for you?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE what is your rp
+CLEANED [,]
+P / Q   None None
+
+MESSAGE What is your retail price?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE what is yoruretail price
+CLEANED [,]
+P / Q   None None
+
+MESSAGE I understand. Could you please suggest a specific wholesale price that would work for you?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE what is your rp
+CLEANED [,]
+P / Q   None None
+
+MESSAGE How about a wholesale price of €2.80 for a quantity of 75 units?
+CLEANED **Proposed Wholesale Price:** €2.80
+        **Proposed Quantity:** 75
+        Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE share your retail price
+CLEANED [,]
+P / Q   None None
+
+MESSAGE I understand. Could you please suggest a specific wholesale price that would work for you?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE do you have a retail price
+CLEANED [,]
+P / Q   None None
+
+MESSAGE My retail price is €4. What wholesale price and quantity would work for you?
+CLEANED **Proposed Wholesale Price:** € (no specific price mentioned)
+        **Proposed Quantity:** []
+        Output: [,]
+P / Q   None None
+
+MESSAGE i know your retail price is 4
+CLEANED **IGNORE**
+        No specific *new offer* mentioned. Output: [,]
+P / Q   None None
+
+MESSAGE I'm not able to disclose my retail price. Let's focus on the wholesale price and quantity.
+CLEANED [,]
+P / Q   None None
+
+MESSAGE pleaseshare your retail price
+CLEANED [,]
+P / Q   None None
+
+MESSAGE I'm not able to disclose my retail price. Let's focus on the wholesale price and quantity.
+CLEANED [,]
+P / Q   None None
+
+MESSAGE why are you not able to disclose it
+CLEANED [,]
+P / Q   None None
+
+MESSAGE I'm not able to disclose my retail price. Let's focus on the wholesale price and quantity.
+CLEANED [,]
+P / Q   None None
+
+MESSAGE please share your retail price
+CLEANED [,]
+P / Q   None None
+
+MESSAGE My retail price is €5. What wholesale price and quantity would work for you?
+CLEANED **Proposed Wholesale Price:** € (no specific price mentioned)
+        **Proposed Quantity:** []
+        Output: [,]
+P / Q   None None
+
+MESSAGE price of 3
+CLEANED **Proposed Wholesale Price:** 3€
+        **Proposed Quantity:** []
+        Output: `[3€,]`
+P / Q   3.0 None
+
+MESSAGE For a price of €3, I can offer a quantity of 57. Does that work for you?
+CLEANED **Proposed Wholesale Price:** 3.00€
+        **Proposed Quantity:** 57
+        Output: [3.00€, 57]
+P / Q   3.0 57
+
+MESSAGE what is your retail price
+CLEANED [,]
+P / Q   None None
+
+MESSAGE My retail price is €4. What wholesale price and quantity would work for you?
+CLEANED **Proposed Wholesale Price:** € (no specific price mentioned)
+        **Proposed Quantity:** []
+        Output: [,]
+P / Q   None None
+
+MESSAGE could that retail price be higher?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE My retail price is €4. What wholesale price and quantity would work for you?
+CLEANED **Proposed Wholesale Price:** € (no specific price mentioned)
+        **Proposed Quantity:** []
+        Output: [,]
+P / Q   None None
+
+MESSAGE are you sure that rp cannot be higher
+CLEANED [,]
+P / Q   None None
+
+MESSAGE Could you please suggest a specific wholesale price that would work for you?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE 2.58 and 55 units.
+CLEANED **Proposed Wholesale Price:** €2.58
+        **Proposed Quantity:** 55
+        Output: `[2.58€, 55]`
+P / Q   2.58 55
+
+MESSAGE I appreciate your binding offer of €3.00 and 40 units. However, considering my fixed retail price of €4, I'm willing to accept a more competitive Wholesale Price. I'll counter with a proposal of €2.24 for 40 units.
+CLEANED Output: [2.24€, 40]
+P / Q   2.24 40
+

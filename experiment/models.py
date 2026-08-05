@@ -19,10 +19,10 @@ Design overview
   Results page. The per-player *_accepted fields are kept as well (repo
   convention, convenient for per-player data exports and for the AI mode).
 
-* Payoffs (Group.set_payoffs): baseline 5€ (oTree participation fee) plus
+* Payoffs (Group.set_payoffs): baseline €5 (oTree participation fee) plus
   5% of the realized post-demand profit; the Supplier's slider task raises
-  the Retailer-side retail price by 0.02€ per passed quality check (capped
-  at +1€). The demand draw lives in Group.draw_demand().
+  the Retailer-side retail price by €0.02 per passed quality check (capped
+  at +€1). The demand draw lives in Group.draw_demand().
 """
 import json
 import random
@@ -173,7 +173,7 @@ class Group(BaseGroup):
         choice, value = self._realized_disclosure()
         if choice in (C.DISCLOSE_TRUE, C.DISCLOSE_OWN) and value is not None:
             return (f"The Retailer disclosed a Retail Price (RP) "
-                    f"of {value:g}€.")
+                    f"of €{value:g}.")
         return ''
 
     @property
@@ -194,25 +194,6 @@ class Group(BaseGroup):
         price, quantity = self.optimal_offer['offer']
         profit = self.optimal_offer['profit']
         return OPTIMAL_OFFER % (price, quantity, profit)
-
-    def _conditional_optimal_offer(self, retail_price: int) -> str:
-        """DST tab: Nash benchmark offer CONDITIONAL on a hypothetical
-        retail price, instead of the absolute optimum (which would leak
-        the true RP draw)."""
-        solution = nash_bargaining_solution(retail_price,
-                                            self.production_cost)
-        price, quantity = solution['offer']
-        return OPTIMAL_OFFER % (price, quantity, solution['profit'])
-
-    # The two RP values of the draw domain (4 or 5); shown side by side on
-    # the DST tab so neither player learns the realized draw from the tool.
-    @property
-    def formatted_optimal_offer_rp4(self) -> str:
-        return self._conditional_optimal_offer(4)
-
-    @property
-    def formatted_optimal_offer_rp5(self) -> str:
-        return self._conditional_optimal_offer(5)
 
     # ── Lifecycle ────────────────────────────────────────────────────────
     def initialize_group(self):
@@ -258,7 +239,7 @@ class Group(BaseGroup):
     def set_payoffs(self):
         """Final payoffs, identical rule for both game versions:
 
-        pay = participation_fee (5€ baseline, handled natively by oTree)
+        pay = participation_fee (€5 baseline, handled natively by oTree)
               + profit_share (5%) * max(realized profit, 0)
 
         Realized profits use the DRAWN demand:

@@ -39,7 +39,7 @@ from .utils import log_debug
 # ── Fixed lines (never LLM-written) ──────────────────────────────────────
 REFUSAL_LINE = ("I'm here only to negotiate widgets -- shall we get back "
                 "to the wholesale price and quantity?")
-ACCEPT_POINTER = ("Glad we agree -- my binding offer of %s is in the "
+ACCEPT_POINTER = ("Glad we agree -- my official offer of %s is in the "
                   "interface. Please click the CONFIRM button to finalize "
                   "the deal.")
 ACCEPT_POINTER_NO_OFFER = (
@@ -161,7 +161,8 @@ _WRONG_DIRECTION = re.compile(r'\btoo low\b|\bso low\b', re.I)
 # Evaluations where the human's PRICE was the (or a) problem -- i.e. it is
 # too HIGH for the retailer; the reply must never call it "too low".
 _PRICE_REJECT_EVALS = (Evaluation.NOT_PROFITABLE_ON_PRICE,
-                       Evaluation.NOT_PROFITABLE_ON_BOTH)
+                       Evaluation.NOT_PROFITABLE_ON_BOTH,
+                       Evaluation.NOT_PROFITABLE_ON_COMBINATION)
 
 
 def lint_problems(text: str, evaluation: Evaluation | None = None) \

@@ -14,7 +14,6 @@ the machine's global oTree install is broken (incompatible `starlette`), and
 
 ```bash
 cd supply_chain_experiment
-source venv/bin/activate
 otree devserver
 ```
 
@@ -31,7 +30,7 @@ Players)"** with two browser windows.
 | 1 | `Instructions`       | both                         | single page of text |
 | 2 | `Disclosure`         | Retailer only                | disclose true RP / own value / nothing; the Supplier is IDLE on `DisclosureWaitPage` |
 |   | `DisclosureReceived` | Supplier only                | the Supplier sees what the Retailer disclosed; the Retailer waits on `NegotiationWaitPage` |
-| 3 | `Negotiation`        | both                         | chat + binding offers on wholesale price `w` and quantity `q`, with the DST tab (migrated 1:1 from the example repo) |
+| 3 | `Negotiation`        | both                         | chat + official offers on wholesale price `w` and quantity `q`, with the DST tab (migrated 1:1 from the example repo) |
 | 4 | `EffortTask`        | Supplier, **only if deal**   | untimed slider task (50 sliders, target 50) with always-available Next; Retailer idles on `ResultsWaitPage`. No deal -> both skip straight to the demand draw |
 | 5 | `Results`           | both                         | drawn demand + payoff placeholders |
 
@@ -98,7 +97,7 @@ scripted stand-ins for the repository's LLM stack -- see `TODO(llm)` in
 
 Flow: the bot's disclosure is shown on `DisclosureReceived` (wait pages
 release instantly for solo groups); the bot greets first on the Negotiation
-page, evaluates every chat/interface offer, counters with binding offers
+page, evaluates every chat/interface offer, counters with official offers
 (idx = -1), and finalizes deals (`{'finished': True}` after a short delay).
 
 ## Payoffs (implemented -- `Group.set_payoffs` in `models.py`)

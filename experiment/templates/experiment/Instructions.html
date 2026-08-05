@@ -85,12 +85,12 @@
         {% endif %}
         <li>
           The item is produced by the supplying company at a Production Cost
-          <strong>(PC)</strong> of {{ group.production_cost }}€, which is
+          <strong>(PC)</strong> of €{{ group.production_cost }}, which is
           common knowledge.
         </li>
         <li>
           The item is sold by the retailer company at a Retail Price
-          <strong>(RP)</strong> of {{ retail_prices }}€, drawn with equal
+          <strong>(RP)</strong> of {{ retail_prices }}, drawn with equal
           probability. <strong>Only the Retailer knows the drawn RP.</strong>
         </li>
         <li>
@@ -164,18 +164,18 @@
         <strong>Supplier Profit = w * min(q, D) - PC * q</strong>
       </div>
       <p><strong>Example:</strong></p>
-      <p>The Production Cost (PC) is 1€, and the parties agreed on a
-        wholesale price (w) of 3€ and a quantity (q) of 50:</p>
+      <p>The Production Cost (PC) is €1, and the parties agreed on a
+        wholesale price (w) of €3 and a quantity (q) of 50:</p>
       <div class="example-box">
         <ul class="mb-0">
           <li>
-            Demand (D) is 75: 3 * min(50, 75) - 1 * 50 = 100€
+            Demand (D) is 75: 3 * min(50, 75) - 1 * 50 = €100
           </li>
           <li>
-            Demand (D) is 25: 3 * min(50, 25) - 1 * 50 = 25€
+            Demand (D) is 25: 3 * min(50, 25) - 1 * 50 = €25
           </li>
           <li>
-            Demand (D) is 50: 3 * min(50, 50) - 1 * 50 = 100€
+            Demand (D) is 50: 3 * min(50, 50) - 1 * 50 = €100
           </li>
         </ul>
       </div>
@@ -193,18 +193,18 @@
         <strong>Retailer Profit = (RP - w) * min(q, D)</strong>
       </div>
       <p><strong>Example:</strong></p>
-      <p>The Retail Price (RP) is 4€, and the parties agreed on a
-        wholesale price (w) of 3€ and a quantity (q) of 50:</p>
+      <p>The Retail Price (RP) is €4, and the parties agreed on a
+        wholesale price (w) of €3 and a quantity (q) of 50:</p>
       <div class="example-box">
         <ul class="mb-0">
           <li>
-            Demand (D) is 75: (4-3) * min(50, 75) = 50€
+            Demand (D) is 75: (4-3) * min(50, 75) = €50
           </li>
           <li>
-            Demand (D) is 25: (4-3) * min(50, 25) = 25€
+            Demand (D) is 25: (4-3) * min(50, 25) = €25
           </li>
           <li>
-            Demand (D) is 50: (4-3) * min(50, 50) = 50€
+            Demand (D) is 50: (4-3) * min(50, 50) = €50
           </li>
         </ul>
       </div>
@@ -280,7 +280,7 @@
           You have {{ timeout_minutes }} minutes to reach an agreement. If the
           time runs out the outcome is an impasse (disagreement), both
           profits are zero, and both sides receive the baseline payment
-          only. (Note: the timer resets to 30 seconds if a binding offer is sent when less than 30 seconds remain.)
+          only. (Note: the timer resets to 30 seconds if an official offer is sent when less than 30 seconds remain.)
         </li>
       </ul>
     </div>

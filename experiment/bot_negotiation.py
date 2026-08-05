@@ -3,7 +3,7 @@ The AI retailer for the Single-Player game (session config ai_retailer=True),
 structured like the example repository's NegotiationBot.
 
 Key departure from the repository -- NO FULL INFORMATION:
-  * the bot knows the production cost (1€, common knowledge), and
+  * the bot knows the production cost (€1, common knowledge), and
   * it negotiates with its ACTING retail price: the value it disclosed to
     the human Supplier (truthful or a lie, per the session setting), or 4
     when it disclosed nothing (config bot_no_disclosure_rp). The true drawn
@@ -52,6 +52,11 @@ class NegotiationBot(BotStrategy):
             'market_price': group.bot_acting_market_price,
             # True draw, for reference/data only; never used in strategy.
             'true_market_price': group.market_price,
+            # Scripted disclosure condition: selects which SYSTEM prompt
+            # the LLM gets (split constraint prompt when a value was
+            # disclosed, the single no-disclosure prompt otherwise).
+            'bot_disclosure': session_config.get('bot_disclosure',
+                                                 C.DISCLOSE_NONE),
 
             # ── LLM stack (see bot_llm.py) ────────────────────────────────
             'llm_user': session_config.get('llm_user'),

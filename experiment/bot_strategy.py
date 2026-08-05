@@ -45,7 +45,7 @@ from .prompts import (PROMPTS, empty_offer_prompt, not_profitable_prompt,
 from .utils import log_debug
 
 # Solver-scripted fallback lines, used ONLY when no LLM host is reachable.
-FALLBACK_OFFER_STRING = "a Wholesale Price of %.2f€ and a quantity of %d units"
+FALLBACK_OFFER_STRING = "a Wholesale Price of €%.2f and a quantity of %d units"
 FALLBACK_ACCEPT_FROM_INTERFACE = (
     "That works for me -- I accept your offer of %s. "
     "Thank you, finalizing the deal now.")
@@ -155,7 +155,10 @@ class BotStrategy(BotLLM):
                         optimal_offer_str: str) -> str:
         args = (self.user_message, optimal_offer_str, self._interactions())
         if evaluation == Evaluation.NOT_OFFER:
-            return empty_offer_prompt(*args)
+            # Condition-split decision tree (retail-price question rule).
+            return empty_offer_prompt(*args,
+                                      self.config.get('bot_disclosure',
+                                                      C.DISCLOSE_TRUE))
         elif evaluation == Evaluation.NOT_PROFITABLE_ON_BOTH:
             return offer_with_single_unfavourable_term_prompt(*args)
         elif evaluation == Evaluation.OFFER_QUANTITY:

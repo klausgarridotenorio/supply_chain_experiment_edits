@@ -27,6 +27,7 @@ from typing import Any
 import httpx
 from ollama import AsyncClient, ChatResponse, ResponseError
 
+from .constants import C
 from .optimal import nash_bargaining_solution
 from .offer import Offer
 from .prompts import PROMPTS, READER_SYSTEM_PROMPT, system_final_prompt
@@ -107,9 +108,13 @@ class BotLLM:
     ############################################################################
     async def get_llm_response(self, content: str) -> ChatResponse:
         assert isinstance(content, str)
-        # The system prompt carries the bot's ACTING retail price (the
-        # disclosed value / no-disclosure fallback), never the true draw.
-        system_prompt = system_final_prompt(self.config['market_price'])
+        # The system prompt depends on the disclosure condition: with a
+        # disclosed value (true or a lie) it carries the bot's ACTING
+        # retail price -- never the true draw; with no disclosure it is
+        # the dedicated prompt that names no retail price at all.
+        system_prompt = system_final_prompt(
+            self.config['market_price'],
+            self.config.get('bot_disclosure', C.DISCLOSE_NONE))
         messages = [{'role': 'system', 'content': system_prompt},
                     {'role': 'user', 'content': content}]
         return await self._chat(

@@ -7,11 +7,11 @@
 #}
 <p>
   {% if player.is_retailer %}
-    <strong>Your Retail Price (RP) is {% group.market_price %}€
+    <strong>Your Retail Price (RP) is €{% group.market_price %}
       (private information).</strong>
-    <strong>The Production Cost (PC) is {% group.production_cost %}€.</strong>
+    <strong>The Production Cost (PC) is €{% group.production_cost %}.</strong>
   {% else %}
-    <strong>The Production Cost (PC) is {% group.production_cost %}€.</strong>
+    <strong>The Production Cost (PC) is €{% group.production_cost %}.</strong>
   {% endif %}
 </p>
 {% if player.is_supplier %}

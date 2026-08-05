@@ -18,6 +18,8 @@ repository.
 """
 import os
 
+from .constants import C
+
 # <project root>/prompts/retailer/ -- resolved from this file's location.
 _PROMPT_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -34,6 +36,11 @@ def _retailer_prompts() -> dict[str, str]:
     return {
         'before_constraint': from_file('system/before_constraint.txt'),
         'after_constraint': from_file('system/after_constraint.txt'),
+        # Single-file system prompt for the no-disclosure condition: the
+        # bot must not mention ANY retail price value, so no constraint
+        # is spliced in at all.
+        'system_no_disclosure': from_file(
+            'system/sys_prompt_no_disclosure.txt'),
         'follow_up_prompt_2nd': from_file('follow_up_user_message.txt'),
         'follow_up_prompt_without_offer': from_file(
             'follow_up_user_message_without_offer.txt'),
@@ -49,6 +56,10 @@ def _retailer_prompts() -> dict[str, str]:
             'single_term_unfavourable_send_nash.txt'),
         'non_profitable_offer_or_deal': from_file(
             'Send_Optimal_Offer_or_Instructions.txt'),
+        # No-disclosure variant: Rule 2.b (retail price question) declines
+        # instead of stating the price.
+        'non_profitable_offer_or_deal_no_disclosure': from_file(
+            'Send_Optimal_Offer_or_Instructions_no_disclosure.txt'),
         'follow_up_conversation': from_file(
             'follow_up_conversation_history.txt'),
         'non_quantity_offer': from_file(
@@ -67,7 +78,7 @@ PROMPTS = {
                      "As we begin, I'd like to give you the opportunity to "
                      "make an offer first. Or if you prefer, I can make "
                      "the first offer. Just let me know! ",
-    'offer_string': "Price of %5.2f€ and quantity of %s",
+    'offer_string': "Price of €%.2f and quantity of %s",
 
     'understanding_offer':
         'Here is the negotiator message you need to read: ',
@@ -146,22 +157,42 @@ Output: [2€,]
 """
 
 
-def system_final_prompt(market_price: int | float) -> str:
-    """The retailer bot's negotiation system prompt. `market_price` must be
-    the bot's ACTING retail price (the disclosed value or the
-    no-disclosure fallback) -- never the true draw."""
+def system_final_prompt(market_price: int | float,
+                        disclosure_choice: str = C.DISCLOSE_NONE) -> str:
+    """The retailer bot's negotiation system prompt, per condition.
+
+    * Disclosure conditions (true_value / own_value): the split
+      before_constraint + €<RP> + after_constraint prompt. `market_price`
+      must be the bot's ACTING retail price (the DISCLOSED value -- true
+      or a lie), never the true draw. In ai_rp5_disclose_lie the acting
+      value is 4, so the constraint reads €4 even though the draw is 5.
+    * No disclosure: a single-file prompt with no retail price value in it
+      (the bot is told not to mention any); `market_price` is unused.
+    """
     prompts = PROMPTS['retailer']
-    return (prompts['before_constraint'] +
-            f"{market_price}€" +
-            prompts['after_constraint'])
+    if disclosure_choice == C.DISCLOSE_NONE:
+        return prompts['system_no_disclosure']
+    # Splice inline: "... the fixed retail price of €5. ..." (from_file
+    # newline-terminates the fragments, so rstrip before joining).
+    return (prompts['before_constraint'].rstrip() + ' ' +
+            f"€{market_price}" +
+            prompts['after_constraint'].lstrip())
 
 
 def empty_offer_prompt(user_message: str, optimal_offer_str: str,
-                       interactions: str) -> str:
+                       interactions: str,
+                       disclosure_choice: str = C.DISCLOSE_TRUE) -> str:
+    """NOT_OFFER reply prompt. The decision tree differs per condition:
+    with a disclosure (true or lie) Rule 2.b states the acting retail
+    price; with no disclosure it declines to reveal it."""
     prompts = PROMPTS['retailer']
+    decision_tree = (
+        prompts['non_profitable_offer_or_deal_no_disclosure']
+        if disclosure_choice == C.DISCLOSE_NONE
+        else prompts['non_profitable_offer_or_deal'])
     return (prompts['follow_up_prompt_without_offer'] +
             user_message + ' ' +
-            prompts['non_profitable_offer_or_deal'] +
+            decision_tree +
             optimal_offer_str + '\n' +
             prompts['follow_up_conversation'] +
             interactions)

@@ -48,9 +48,10 @@ class Instructions(Page):
     def vars_for_template(player: Player) -> dict[str, Any]:
         config = player.session.config
 
-        # "4 or 5" -- same presentation helper as the example repository.
-        prices = [str(x) for x in range(config['market_price_low'],
-                                        config['market_price_high'] + 1)]
+        # "€4 or €5" -- same presentation helper as the example repository
+        # (€ prefixed per value so the joined phrase reads unambiguously).
+        prices = [f"€{x}" for x in range(config['market_price_low'],
+                                         config['market_price_high'] + 1)]
         retail_prices = (' or '.join([', '.join(prices[:-1]), prices[-1]])
                          if len(prices) > 1 else prices[0])
 

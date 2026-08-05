@@ -1,8 +1,8 @@
 {#
   Private Information Disclosure page (Retailer only).
   The Retailer makes their choice by clicking one of three buttons:
-    1. Disclose 4      -> the Supplier is shown an RP of 4€
-    2. Disclose 5      -> the Supplier is shown an RP of 5€
+    1. Disclose 4      -> the Supplier is shown an RP of €4
+    2. Disclose 5      -> the Supplier is shown an RP of €5
     3. No Disclosure   -> nothing is shown
   A click fills the hidden disclosure_choice / disclosed_value form fields
   and submits the page immediately; the true/own/none categorization is
@@ -22,7 +22,7 @@
     <div class="card-body">
       <p class="mb-0">
         Your <strong>Retail Price (RP)</strong> for this negotiation is
-        <strong>{{ group.market_price }}€</strong>.
+        <strong>€{{ group.market_price }}</strong>.
         The Supplier does <strong>not</strong> know this value.
       </p>
     </div>

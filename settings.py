@@ -66,7 +66,7 @@ SESSION_CONFIG_DEFAULTS = dict(
     #   'true_value'    -> discloses the drawn retail price
     #   'own_value'     -> discloses bot_disclosed_value instead (the lie)
     #   'no_disclosure' -> discloses nothing
-    bot_disclosure='no_disclosure',
+    bot_disclosure='true_value',
     bot_disclosed_value=4,
     # With no disclosure the bot negotiates as if it had disclosed this:
     bot_no_disclosure_rp=4,
@@ -119,7 +119,7 @@ SESSION_CONFIG_DEFAULTS = dict(
     demand_max=100,
 
     # ── Payoffs (see Group.set_payoffs) ──────────────────────────────────
-    # Everyone gets the baseline (oTree participation fee) of 5€; on top of
+    # Everyone gets the baseline (oTree participation fee) of €5; on top of
     # that, each side earns profit_share (5%) of their REALIZED profit from
     # the deal, computed after the demand draw. Negative profit = no bonus.
     participation_fee=5.00,

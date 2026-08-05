@@ -22,6 +22,10 @@ class Evaluation(Enum):
     NOT_PROFITABLE_ON_BOTH = 'not_profitable_on_both'
     NOT_PROFITABLE_ON_PRICE = 'not_profitable_on_price'
     NOT_PROFITABLE_ON_QUANTITY = 'not_profitable_on_quantity'
+    # Each term could reach the bot's Nash target on its own; only the
+    # offered COMBINATION falls short. The counter keeps the human's
+    # quantity and re-solves the price (see optimal_counter_offer).
+    NOT_PROFITABLE_ON_COMBINATION = 'not_profitable_on_combination'
     OFFER_QUANTITY = 'offer_quantity'
     OFFER_PRICE = 'offer_price'
     NOT_OFFER = 'not_offer'
@@ -156,8 +160,9 @@ class Offer(dict):
         elif quantity_is_unfeasible:
             return Evaluation.NOT_PROFITABLE_ON_QUANTITY
         else:
-            # Should not happen; default to not profitable on both.
-            return Evaluation.NOT_PROFITABLE_ON_BOTH
+            # Both terms are individually feasible, but this price/quantity
+            # pair leaves the bot below its Nash target.
+            return Evaluation.NOT_PROFITABLE_ON_COMBINATION
 
     def evaluate(self, constraint_user: int, constraint_bot: int) -> Evaluation:
         """Evaluate this offer from the bot's perspective (repo logic).

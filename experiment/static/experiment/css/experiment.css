@@ -2,9 +2,50 @@
   display: none;
 }
 
+/* Countdown panel: fixed to the left edge at mid-height, so it stays in
+   view on every tab (Instructions / Negotiate / Profit Analysis) and
+   while scrolling. The JS hooks stay on .time-left (red under 30s) and
+   .otree-timer__time-left (countdown), so only presentation changes. */
 .time-left {
-  float: right;
-  margin-top: -55px;
+  position: fixed;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1050;
+  margin: 0;
+  width: 120px;
+  padding: 12px 10px;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  font-size: 1rem;
+}
+
+.time-left .otree-timer__time-left {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Narrow screens: the centered content column has no free left margin, so
+   a left panel would cover it; dock the timer to the top-left instead
+   (still fixed while scrolling). */
+@media (max-width: 1100px) {
+  .time-left {
+    top: 8px;
+    transform: none;
+    width: auto;
+    padding: 6px 10px;
+  }
+  .time-left .otree-timer__time-left {
+    display: inline;
+    margin: 0;
+    font-size: 1.1rem;
+  }
 }
 
 #myPrice {

@@ -17,7 +17,7 @@ import math
 from .constants import C
 from .offer import Offer, Evaluation
 
-OPTIMAL_OFFER = ("A Wholesale Price of %.2f€ and %d units have expected "
+OPTIMAL_OFFER = ("A Wholesale Price of €%.2f and %d units have expected "
                  "profits of %.1f (Same expected profit for you and your "
                  "counterpart).")
 
@@ -197,7 +197,10 @@ def optimal_counter_offer(evaluation: Evaluation,
                         Evaluation.NOT_PROFITABLE_ON_QUANTITY):
         price, quantity = optimal_quantity_for_wholesale_price(*args)
     elif evaluation in (Evaluation.OFFER_QUANTITY,
-                        Evaluation.NOT_PROFITABLE_ON_PRICE):
+                        Evaluation.NOT_PROFITABLE_ON_PRICE,
+                        Evaluation.NOT_PROFITABLE_ON_COMBINATION):
+        # ON_COMBINATION: both terms are feasible alone -- concede by
+        # keeping the human's quantity and re-pricing at the Nash target.
         price, quantity = optimal_wholesale_price_for_quantity(*args)
     else:
         # NOT_PROFITABLE_ON_BOTH, NOT_OFFER

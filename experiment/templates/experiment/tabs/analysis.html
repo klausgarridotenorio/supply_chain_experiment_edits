@@ -2,24 +2,9 @@
    static/experiment/js/analysis.js and uses the profit formulas
      Supplier: w * min(q, D) - PC * q
      Retailer: (RP - w) * min(q, D)
-   evaluated over the whole demand range. The absolute optimal offer is NOT
-   shown; instead two Nash benchmark offers are given CONDITIONAL on the
-   Retail Price being 4 or 5, and the interactive graph uses the RP chosen
-   in the dropdown below. #}
-<h3>Conditional Optimal Offers</h3>
-<p>
-  The optimal (equal expected profit) offer depends on the Retail Price
-  (RP), which can be 4€ or 5€:
-</p>
-<ul>
-  <li>
-    <strong>If RP = 4€:</strong> {% group.formatted_optimal_offer_rp4 %}
-  </li>
-  <li>
-    <strong>If RP = 5€:</strong> {% group.formatted_optimal_offer_rp5 %}
-  </li>
-</ul>
-
+   evaluated over the whole demand range. No optimal offer is shown
+   (absolute or conditional); the interactive graph uses the RP chosen in
+   the dropdown below. #}
 <h3>Decision Support System</h3>
 <p>
   Choose a hypothetical Retail Price (RP), then enter a Wholesale Price and
