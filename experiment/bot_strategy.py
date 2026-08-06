@@ -96,16 +96,24 @@ class BotStrategy(BotLLM):
         JsonField: reassign, never mutate in place."""
         self.player.offers = list(self.offer_list)
 
-    def _interactions(self) -> str:
-        """Conversation history in the format the prompt files describe:
-        bot lines under role 'system', human lines under role 'user'
-        (repo's InteractionList, rebuilt from the player's chat_data)."""
-        history = [
-            {'role': 'user' if '(Me)' in message['nick'] else 'system',
-             'content': message['body']}
-            for message in self.player.chat_data
-        ]
-        return str(history)
+    def _interactions_slice(self, from_human: bool) -> str:
+        """One side of the split conversation history: the last five
+        messages of that speaker, most recent first, one per line -- fed
+        into the prompts' two separate triple-quoted history blocks
+        (conversation_history_bot/_counterpart.txt). Human lines carry
+        '(Me)' in the nick (models.process_chat)."""
+        lines = [message['body'] for message in self.player.chat_data
+                 if ('(Me)' in message.get('nick', '')) == from_human]
+        recent = lines[-5:][::-1]
+        if not recent:
+            return '(none)'
+        return '\n'.join(f'- {line}' for line in recent)
+
+    def _interactions_bot(self) -> str:
+        return self._interactions_slice(from_human=False)
+
+    def _interactions_counterpart(self) -> str:
+        return self._interactions_slice(from_human=True)
 
     # ── Core response logic (repo's BotStrategy.evaluate, LLM-driven) ────
     async def evaluate_and_respond(self, offer: Offer) \
@@ -153,7 +161,8 @@ class BotStrategy(BotLLM):
     # ── LLM response generation (repo's respond_to_offer retry loop) ─────
     def _respond_prompt(self, evaluation: Evaluation | None,
                         optimal_offer_str: str) -> str:
-        args = (self.user_message, optimal_offer_str, self._interactions())
+        args = (self.user_message, optimal_offer_str,
+                self._interactions_bot(), self._interactions_counterpart())
         if evaluation == Evaluation.NOT_OFFER:
             # Condition-split decision tree (retail-price question rule).
             return empty_offer_prompt(*args,

@@ -727,3 +727,167 @@ MESSAGE I appreciate your binding offer of €3.00 and 40 units. However, consid
 CLEANED Output: [2.24€, 40]
 P / Q   2.24 40
 
+MESSAGE yeah. so make me an offer.
+CLEANED [,]
+P / Q   None None
+
+MESSAGE How about a wholesale price of €2.80 for a quantity of 75 units?
+CLEANED **Proposed Wholesale Price:** €2.80
+        **Proposed Quantity:** 75
+        Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE your offer sucks. please do better. i need a higher price.
+CLEANED [,]
+P / Q   None None
+
+MESSAGE My retail price is €4. What wholesale price and quantity would work for you?
+CLEANED **Proposed Wholesale Price:** € (no specific price mentioned)
+        **Proposed Quantity:** []
+        Output: [,]
+P / Q   None None
+
+MESSAGE reject your offer
+CLEANED [,]
+P / Q   None None
+
+MESSAGE Could you please suggest a specific wholesale price that would work for you?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE put your offer in the interface
+CLEANED [,]
+P / Q   None None
+
+MESSAGE How about a wholesale price of €2.80 for a quantity of 75 units?
+CLEANED **Proposed Wholesale Price:** €2.80
+        **Proposed Quantity:** 75
+        Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE yeah. so make me an offer.
+CLEANED [,]
+P / Q   None None
+
+MESSAGE How about a wholesale price of €2.80 for a quantity of 75 units?
+CLEANED **Proposed Wholesale Price:** €2.80
+        **Proposed Quantity:** 75
+        Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE yeah. so make me an offer.
+CLEANED [,]
+P / Q   None None
+
+MESSAGE How about a wholesale price of €2.80 for a quantity of 75 units?
+CLEANED **Proposed Wholesale Price:** 2.80€
+        **Proposed Quantity:** 75
+        Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE i need higher price
+CLEANED [,]
+P / Q   None None
+
+MESSAGE Could you please suggest a specific wholesale price that would work for you?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE make me an offer
+CLEANED [,]
+P / Q   None None
+
+MESSAGE How about a wholesale price of €2.80 for a quantity of 75 units?
+CLEANED **Proposed Wholesale Price:** €2.80
+        **Proposed Quantity:** 75
+        Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE Make me a good offer.
+CLEANED [,]
+P / Q   None None
+
+MESSAGE How about a wholesale price of €2.80 for a quantity of 75 units?
+CLEANED **Proposed Wholesale Price:** €2.80
+        **Proposed Quantity:** 75
+        Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE i need higher price
+CLEANED [,]
+P / Q   None None
+
+MESSAGE Could you please suggest a specific wholesale price that would work for you?
+CLEANED [,]
+P / Q   None None
+
+MESSAGE maybe a price just bellow 3
+CLEANED **Proposed Wholesale Price:** €2.99 (since "just below" implies a specific number)
+        **Proposed Quantity:** []
+        Output: [2.99€,]
+P / Q   2.99 None
+
+MESSAGE I understand your concern about the profit, but I'm not willing to compromise on the quantity. How about a price of €2.80 and a quantity of 75 units?
+CLEANED [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE need quantity bellow 30
+CLEANED [,]
+P / Q   None None
+
+MESSAGE I understand your concern about the quantity. How about a wholesale price of €1.79 for a quantity of 30?
+CLEANED **Proposed Wholesale Price:** €1.79
+        **Proposed Quantity:** 30
+        Output: [1.79€, 30]
+P / Q   1.79 30
+
+MESSAGE can u do 29
+CLEANED **Proposed Wholesale Price:** €29.00
+        **Proposed Quantity:** []
+        Output: [29.00€,]
+P / Q   29.0 None
+
+MESSAGE The offer received is invalid because the Quantity is out of bounds. Remember, Quantity ranges from 1 to 100 with no decimals. Let's discuss a valid proposal.
+CLEANED No output needed for this message as it does not contain any proposed wholesale price or quantity.
+P / Q   None None
+
+MESSAGE make me an offer
+CLEANED [,]
+P / Q   None None
+
+MESSAGE How about a wholesale price of €2.80 for a quantity of 75 units?
+CLEANED **Proposed Wholesale Price:** 2.80€
+        **Proposed Quantity:** 75
+        Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE I'm surprised by your binding offer of €3.00 and 20 units. Let's explore other options. How about a wholesale price of €2.80 for a quantity of 75 units?
+CLEANED Output: [2.80€, 75]
+P / Q   2.8 75
+
+MESSAGE I'm surprised by your binding offer. Given our previous discussions, I'd like to counter with a wholesale price of €1.79 and quantity of 30 units.
+CLEANED **Proposed Wholesale Price:** €1.79
+        **Proposed Quantity:** 30
+        Output: [1.79€, 30]
+P / Q   1.79 30
+
+MESSAGE I'm surprised by your binding offer. Considering our previous discussions and my fixed retail price of €4, I'll counter with a wholesale price of €2.50 and quantity of 50 units.
+CLEANED Output: [2.50€, 50]
+P / Q   2.5 50
+
+MESSAGE I'm surprised by your binding offer. Considering our previous discussions and my fixed retail price of €4, I'll counter with a wholesale price of €2.24 and quantity of 40 units.
+CLEANED Output: [2.24€, 40]
+P / Q   2.24 40
+
+MESSAGE I'm surprised by your binding offer. Considering our previous discussions and my fixed retail price of €4, I'll counter with a wholesale price of €2.66 and quantity of 60 units.
+CLEANED Output: [2.66€, 60]
+P / Q   2.66 60
+
+MESSAGE I'm surprised by your binding offer. Considering our previous discussions and my fixed retail price of €4, I'll counter with a wholesale price of €1.79 and quantity of 30 units.
+CLEANED Output: [1.79€, 30]
+P / Q   1.79 30
+
+MESSAGE I'm surprised by your binding offer. Considering our previous discussions and my fixed retail price of €4, I'll counter with a wholesale price of €2.86 and quantity of 89 units.
+CLEANED Output: [2.86€, 89]
+P / Q   2.86 89
+

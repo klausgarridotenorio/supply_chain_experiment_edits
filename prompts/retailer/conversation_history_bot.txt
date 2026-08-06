@@ -1,0 +1,2 @@
+] (end of offers to choose from).
+Choose the price and quantity combination inside the [] brackets. Then feel free to take a look at the last five messages you sent to the counterpart (starting from the most recent to the oldest): """

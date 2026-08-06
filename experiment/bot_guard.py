@@ -164,6 +164,10 @@ _PRICE_REJECT_EVALS = (Evaluation.NOT_PROFITABLE_ON_PRICE,
                        Evaluation.NOT_PROFITABLE_ON_BOTH,
                        Evaluation.NOT_PROFITABLE_ON_COMBINATION)
 
+# The prompts ask for a single short string (<= ~20 words; accepts <= 30).
+# Anything far beyond that is a runaway generation, never a valid reply.
+_MAX_REPLY_WORDS = 60
+
 
 def lint_problems(text: str, evaluation: Evaluation | None = None) \
         -> list[str]:
@@ -179,6 +183,10 @@ def lint_problems(text: str, evaluation: Evaluation | None = None) \
         problems.append(
             "wrong direction: their price is too HIGH for the retailer, "
             "never 'too low'")
+    if len(text.split()) > _MAX_REPLY_WORDS:
+        problems.append(
+            'runaway length: the reply must be one short string '
+            '(the prompts ask for at most ~20 words)')
     return problems
 
 

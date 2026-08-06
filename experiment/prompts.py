@@ -60,8 +60,14 @@ def _retailer_prompts() -> dict[str, str]:
         # instead of stating the price.
         'non_profitable_offer_or_deal_no_disclosure': from_file(
             'Send_Optimal_Offer_or_Instructions_no_disclosure.txt'),
-        'follow_up_conversation': from_file(
-            'follow_up_conversation_history.txt'),
+        # Split conversation history: the bot's own last messages and the
+        # counterpart's last messages are fed as two separate blocks (each
+        # inside triple quotes), so the LLM can never entangle who said
+        # what -- replaces the old single mixed-role interactions list.
+        'conversation_history_bot': from_file(
+            'conversation_history_bot.txt'),
+        'conversation_history_counterpart': from_file(
+            'conversation_history_counterpart.txt'),
         'non_quantity_offer': from_file(
             'Not_Quantity_Send_Optimal_Offer.txt'),
         'follow_up_invalid_offer': from_file(
@@ -179,8 +185,19 @@ def system_final_prompt(market_price: int | float,
             prompts['after_constraint'].lstrip())
 
 
+def _history_block(interactions_bot: str, interactions_user: str) -> str:
+    """The split conversation-history tail shared by all follow-up
+    prompts: the bot's own last messages, then the counterpart's, each in
+    a separate triple-quoted block (most recent first)."""
+    prompts = PROMPTS['retailer']
+    return (prompts['conversation_history_bot'] +
+            interactions_bot + '\n' +
+            prompts['conversation_history_counterpart'] +
+            interactions_user + '\n"""')
+
+
 def empty_offer_prompt(user_message: str, optimal_offer_str: str,
-                       interactions: str,
+                       interactions_bot: str, interactions_user: str,
                        disclosure_choice: str = C.DISCLOSE_TRUE) -> str:
     """NOT_OFFER reply prompt. The decision tree differs per condition:
     with a disclosure (true or lie) Rule 2.b states the acting retail
@@ -194,53 +211,51 @@ def empty_offer_prompt(user_message: str, optimal_offer_str: str,
             user_message + ' ' +
             decision_tree +
             optimal_offer_str + '\n' +
-            prompts['follow_up_conversation'] +
-            interactions)
+            _history_block(interactions_bot, interactions_user))
 
 
-def offer_with_single_unfavourable_term_prompt(user_message: str,
-                                               optimal_offer_str: str,
-                                               interactions: str) -> str:
+def offer_with_single_unfavourable_term_prompt(
+        user_message: str, optimal_offer_str: str,
+        interactions_bot: str, interactions_user: str) -> str:
     prompts = PROMPTS['retailer']
     return (prompts['follow_up_prompt_unfavourable_term_offer'] +
             user_message + ' ' +
             prompts['unfavourable_term_offer'] +
             optimal_offer_str + '\n' +
-            prompts['follow_up_conversation'] +
-            interactions)
+            _history_block(interactions_bot, interactions_user))
 
 
 def offer_without_quantity_prompt(user_message: str, optimal_offer_str: str,
-                                  interactions: str) -> str:
+                                  interactions_bot: str,
+                                  interactions_user: str) -> str:
     prompts = PROMPTS['retailer']
     return (prompts['follow_up_prompt_without_quantity'] +
             user_message + ' ' +
             prompts['non_quantity_offer'] +
             optimal_offer_str + '\n' +
-            prompts['follow_up_conversation'] +
-            interactions)
+            _history_block(interactions_bot, interactions_user))
 
 
 def offer_without_price_prompt(user_message: str, optimal_offer_str: str,
-                               interactions: str) -> str:
+                               interactions_bot: str,
+                               interactions_user: str) -> str:
     prompts = PROMPTS['retailer']
     return (prompts['follow_up_prompt_without_price'] +
             user_message + ' ' +
             prompts['non_price_offer'] +
             optimal_offer_str + '\n' +
-            prompts['follow_up_conversation'] +
-            interactions)
+            _history_block(interactions_bot, interactions_user))
 
 
 def not_profitable_prompt(user_message: str, optimal_offer_str: str,
-                          interactions: str) -> str:
+                          interactions_bot: str,
+                          interactions_user: str) -> str:
     prompts = PROMPTS['retailer']
     return (prompts['follow_up_prompt_2nd'] +
             user_message + ' ' +
             prompts['non_profitable_offer'] +
             optimal_offer_str + '\n' +
-            prompts['follow_up_conversation'] +
-            interactions)
+            _history_block(interactions_bot, interactions_user))
 
 
 def offer_invalid_prompt(user_message: str) -> str:
