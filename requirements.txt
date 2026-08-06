@@ -10,3 +10,7 @@ httpx>=0.27
 # falls back to the LLM reader when spacy or its model is missing):
 #   pip install spacy && python -m spacy download en_core_web_sm
 # spacy>=3.7
+
+# Postgres driver for Heroku (oTree reads DATABASE_URL; SQLAlchemy's
+# postgres dialect imports psycopg2). Not needed for local sqlite dev.
+psycopg2-binary>=2.9
