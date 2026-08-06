@@ -73,12 +73,19 @@ def creating_session(subsession: Subsession):
 
     for group in subsession.get_groups():
         group.initialize_group()
+        # Negotiation-only demo: the wait pages (where set_opponents
+        # normally runs) are skipped, so wire the human-vs-AI match here.
+        if config.get('negotiation_only', False):
+            group.set_opponents()
 
 
 def _check_config(config: dict[str, Any]):
     assert config['market_price_high'] >= config['market_price_low']
     assert config['market_price_low'] > config['production_cost']
     assert config['demand_max'] > config['demand_min']
+    if config.get('negotiation_only', False):
+        assert config.get('ai_retailer', False), \
+            'negotiation_only demos require ai_retailer=True'
     if config.get('ai_retailer', False):
         assert config['bot_disclosure'] in (
             C.DISCLOSE_TRUE, C.DISCLOSE_OWN, C.DISCLOSE_NONE)

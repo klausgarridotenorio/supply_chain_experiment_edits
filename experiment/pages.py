@@ -21,6 +21,10 @@ Retailer seat idle):
                                            Supplier works; on arrival of all:
                                            demand draw + payoff stub
   5. Results               both            demand + payoff placeholders
+
+Negotiation-only demo (demo_* configs, negotiation_only=True): every page
+above except Negotiation is skipped; set_opponents runs in creating_session
+instead of the NegotiationWaitPage, and DemoResults closes the session.
 """
 import json
 import random
@@ -37,12 +41,23 @@ from .models import Player, Group
 from .utils import now_datetime
 
 
+def negotiation_only(player: Player) -> bool:
+    """True in the standalone demo (demo_* session configs): only the
+    Negotiation page (plus a minimal outcome page) is shown; every other
+    page's is_displayed is gated on this."""
+    return bool(player.session.config.get('negotiation_only', False))
+
+
 ################################################################################
 # 1. Instructions
 ################################################################################
 
 class Instructions(Page):
     """Single page of instructions text (see Instructions.html)."""
+
+    @staticmethod
+    def is_displayed(player: Player) -> bool:
+        return not negotiation_only(player)
 
     @staticmethod
     def vars_for_template(player: Player) -> dict[str, Any]:
@@ -89,6 +104,10 @@ class ComprehensionCheck1(Page):
     form_model = 'player'
     form_fields = ['comprehension_check']
     template_name = 'experiment/ComprehensionCheck.html'
+
+    @staticmethod
+    def is_displayed(player: Player) -> bool:
+        return not negotiation_only(player)
 
     # question index -> (quantity, demand): mixes over-, under- and
     # exactly-met demand, so the min(q, D) logic is exercised.
@@ -239,7 +258,7 @@ class Disclosure(Page):
 
     @staticmethod
     def is_displayed(player: Player) -> bool:
-        return player.is_retailer
+        return player.is_retailer and not negotiation_only(player)
 
     @staticmethod
     def js_vars(player: Player) -> dict[str, Any]:
@@ -282,16 +301,22 @@ class DisclosureWaitPage(WaitPage):
     body_text = ("The Retailer is making their disclosure decision. "
                  "You will see the outcome next.")
 
+    @staticmethod
+    def is_displayed(player: Player) -> bool:
+        return not negotiation_only(player)
+
 
 class DisclosureReceived(Page):
     """Second disclosure page: the Supplier is shown what the Retailer
     disclosed (or that nothing was disclosed) before entering the
     negotiation. The Retailer skips this page and waits on the
-    NegotiationWaitPage."""
+    NegotiationWaitPage. In the negotiation-only demo it is skipped: the
+    bot's disclosure banner on the Negotiation page (prices tab) carries
+    the same information."""
 
     @staticmethod
     def is_displayed(player: Player) -> bool:
-        return player.is_supplier
+        return player.is_supplier and not negotiation_only(player)
 
 
 class NegotiationWaitPage(WaitPage):
@@ -300,6 +325,12 @@ class NegotiationWaitPage(WaitPage):
     in the single-player game)."""
     title_text = "Please wait"
     body_text = "Waiting for the other participant. The negotiation starts next."
+
+    @staticmethod
+    def is_displayed(player: Player) -> bool:
+        # Negotiation-only demo: skipped -- set_opponents already ran in
+        # creating_session (models.py).
+        return not negotiation_only(player)
 
     @staticmethod
     def after_all_players_arrive(group: Group):
@@ -503,7 +534,8 @@ class Disclosure_reveal(Page):
 
     @staticmethod
     def is_displayed(player: Player) -> bool:
-        return player.is_supplier and player.group.deal_reached
+        return (player.is_supplier and player.group.deal_reached
+                and not negotiation_only(player))
 
 
 ################################################################################
@@ -535,7 +567,8 @@ class EffortTask(Page):
     def is_displayed(player: Player) -> bool:
         # Skipped entirely (by BOTH players) when no deal was reached, which
         # routes everyone straight to the Demand Draw / Results phase.
-        return player.is_supplier and player.group.deal_reached
+        return (player.is_supplier and player.group.deal_reached
+                and not negotiation_only(player))
 
     @staticmethod
     def vars_for_template(player: Player) -> dict[str, Any]:
@@ -567,6 +600,11 @@ class ResultsWaitPage(WaitPage):
                  "The results will be shown next.")
 
     @staticmethod
+    def is_displayed(player: Player) -> bool:
+        # Negotiation-only demo: no demand draw, no payoffs.
+        return not negotiation_only(player)
+
+    @staticmethod
     def after_all_players_arrive(group: Group):
         group.draw_demand()
         group.set_payoffs()  # TODO(payoffs): currently a stub
@@ -583,6 +621,10 @@ class Results(Page):
     realized profit and payment). In particular the Supplier never sees the
     Retailer's profit or the effective RP -- that would reveal the true
     retail price (and, in the Single-Player game, whether the AI lied)."""
+
+    @staticmethod
+    def is_displayed(player: Player) -> bool:
+        return not negotiation_only(player)
 
     @staticmethod
     def vars_for_template(player: Player) -> dict[str, Any]:
@@ -624,6 +666,27 @@ class Results(Page):
         }
 
 
+class DemoResults(Page):
+    """Negotiation-only demo (demo_* configs) closing page: states whether
+    a deal was reached and its terms. No demand draw, no payoffs -- the
+    demo ends here."""
+
+    @staticmethod
+    def is_displayed(player: Player) -> bool:
+        return negotiation_only(player)
+
+    @staticmethod
+    def vars_for_template(player: Player) -> dict[str, Any]:
+        group = player.group
+        deal = group.deal_reached
+        return {
+            'deal_reached': deal,
+            'formatted_deal_price': f"{group.deal_price:.2f}" if deal else "",
+            'formatted_deal_quantity':
+                str(group.deal_quantity) if deal else "",
+        }
+
+
 page_sequence = [
     Instructions,
 
@@ -645,4 +708,5 @@ page_sequence = [
     ResultsWaitPage,
 
     Results,
+    DemoResults,
 ]

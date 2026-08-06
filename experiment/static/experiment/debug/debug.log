@@ -982,3 +982,4 @@ Output: [1.79€, 30]
 [2026-08-05 19:35:49] [BotLLM] reader model 'offer_reader_v4' missing; falling back to llama3
 [2026-08-05 19:35:50] [DEBUG bot_llm.interpret_offer] Output: [2.86€, 89]
 [2026-08-05 19:35:50] [BotStrategy._respond_to_offer] candidate eval: accept
+[2026-08-06 18:33:29] [BotLLM] using host https://ollama1.src-automating.src.surf-hosted.nl

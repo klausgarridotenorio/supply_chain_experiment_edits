@@ -12,6 +12,11 @@ Session configs:
     During the negotiation the bot follows its disclosure: it negotiates on
     the disclosed value; with no disclosure it negotiates as if it had
     disclosed 4 (bot_no_disclosure_rp).
+  * demo_* -- the same four AI-retailer settings as standalone demos
+    (negotiation_only=True): the participant lands directly on the
+    Negotiation page -- no instructions, comprehension checks, disclosure
+    pages, effort task or results stage. The full experiment configs above
+    are untouched by this mode.
 """
 from os import environ
 
@@ -28,6 +33,16 @@ def ai_setting(name: str, display_name: str, retail_price: int,
         market_price_low=retail_price,
         market_price_high=retail_price,
         bot_disclosure=bot_disclosure,
+    )
+
+
+def demo_setting(name: str, display_name: str, retail_price: int,
+                 bot_disclosure: str) -> dict:
+    """Negotiation-only demo: an ai_setting that shows ONLY the
+    Negotiation page (see negotiation_only in pages.py)."""
+    return dict(
+        ai_setting(name, display_name, retail_price, bot_disclosure),
+        negotiation_only=True,
     )
 
 
@@ -53,6 +68,21 @@ SESSION_CONFIGS = [
     ai_setting('ai_rp4_no_disclosure',
                "AI Retailer -- RP=4, no disclosure",
                retail_price=4, bot_disclosure='no_disclosure'),
+
+    # ── Negotiation-only demos (same four AI settings, negotiation page
+    #    only -- the full experiment configs above are unaffected) ────────
+    demo_setting('demo_rp5_disclose_true',
+                 "DEMO Negotiation only -- RP=5, truthful disclosure (5)",
+                 retail_price=5, bot_disclosure='true_value'),
+    demo_setting('demo_rp5_disclose_lie',
+                 "DEMO Negotiation only -- RP=5, lies and discloses 4",
+                 retail_price=5, bot_disclosure='own_value'),
+    demo_setting('demo_rp4_disclose_true',
+                 "DEMO Negotiation only -- RP=4, truthful disclosure (4)",
+                 retail_price=4, bot_disclosure='true_value'),
+    demo_setting('demo_rp4_no_disclosure',
+                 "DEMO Negotiation only -- RP=4, no disclosure",
+                 retail_price=4, bot_disclosure='no_disclosure'),
 ]
 
 SESSION_CONFIG_DEFAULTS = dict(
@@ -60,6 +90,11 @@ SESSION_CONFIG_DEFAULTS = dict(
     # False: Two-Human game. True: Single-Player game (Supplier vs the AI
     # retailer; see experiment/bot_negotiation.py).
     ai_retailer=False,
+    # True (demo_* configs only, requires ai_retailer=True): show ONLY the
+    # Negotiation page -- no instructions, comprehension checks, disclosure
+    # stage, effort task or results; a minimal demo-outcome page closes the
+    # session instead.
+    negotiation_only=False,
 
     # ── AI retailer behavior (only used when ai_retailer=True) ──────────
     # What the bot disclosed before the negotiation:

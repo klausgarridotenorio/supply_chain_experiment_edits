@@ -1,0 +1,34 @@
+{#
+  Closing page of the negotiation-only demo (demo_* session configs):
+  restates the negotiation outcome. There is no demand draw, effort task
+  or payment in the demo -- the session ends here.
+#}
+{% block title %}
+  Demo Complete
+{% endblock %}
+
+{% block content %}
+  {% if not deal_reached %}
+    <div class="alert alert-warning" role="alert">
+      <h3 class="alert-heading">❌ No Deal Reached</h3>
+      <p class="mb-0">No agreement was reached on time.</p>
+    </div>
+  {% else %}
+    <div class="card mb-4">
+      <div class="card-header bg-success text-white">
+        <h3 class="card-title mb-0">✅ Negotiation Results</h3>
+      </div>
+      <div class="card-body">
+        <p><strong>Wholesale Price:</strong>
+          <span class="fs-5">€{{ formatted_deal_price }} per unit</span></p>
+        <p class="mb-0"><strong>Quantity:</strong>
+          <span class="fs-5">{{ formatted_deal_quantity }} units</span></p>
+      </div>
+    </div>
+  {% endif %}
+
+  <p class="text-muted mb-0">
+    This was a demo of the negotiation stage only -- no demand draw,
+    effort task or payments follow.
+  </p>
+{% endblock %}

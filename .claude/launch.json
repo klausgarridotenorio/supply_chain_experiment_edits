@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "otree-devserver",
+      "runtimeExecutable": "venv/bin/otree",
+      "runtimeArgs": ["devserver", "8020"],
+      "port": 8020
+    }
+  ]
+}
