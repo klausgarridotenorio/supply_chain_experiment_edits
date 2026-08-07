@@ -310,7 +310,7 @@ function updateProfitDetails(graph_price, graph_quantity, expectedDemand, expect
   if (expectedSupplierProfit < 0 || expectedRetailerProfit < 0) {
     html += `
       <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-top: 10px;">
-        <strong>⚠️ Warning:</strong> Negative expected profits detected. This deal may result in losses.
+        <strong> Warning:</strong> Negative expected profits detected. This deal may result in losses.
       </div>
     `;
   }
