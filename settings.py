@@ -131,12 +131,12 @@ SESSION_CONFIG_DEFAULTS = dict(
     },
 
     # ── Timing ───────────────────────────────────────────────────────────
-    timeout_negotiation=5 * 60,  # seconds on the Negotiation page
+    timeout_negotiation=10 * 60,  # seconds on the Negotiation page
     # HIDDEN hard cap on the <30s offer reset rule: once this much total
     # real time has elapsed since the Negotiation page first loaded,
     # binding offers stop resetting the visible timer (it just runs out).
     # Tracked server-side only -- participants never see this value.
-    timeout_negotiation_hard_cap=10 * 60,
+    timeout_negotiation_hard_cap=15 * 60,
 
     # ── Market parameters ─────────────────────────────────────────────────
     # Production cost (PC) is fixed and common knowledge; the retail price

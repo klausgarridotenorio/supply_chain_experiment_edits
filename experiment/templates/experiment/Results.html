@@ -15,14 +15,14 @@
 {% block content %}
   {% if not deal_reached %}
     <div class="alert alert-warning" role="alert">
-      <h3 class="alert-heading">❌ No Deal Reached</h3>
+      <h3 class="alert-heading">No Deal Reached</h3>
       <p class="mb-0">No agreement was reached on time. Both profits are
         zero, so you receive the baseline payment only.</p>
     </div>
   {% else %}
     <div class="card mb-4">
       <div class="card-header bg-success text-white">
-        <h3 class="card-title mb-0">✅ Negotiation Results</h3>
+        <h3 class="card-title mb-0">Negotiation Results</h3>
       </div>
       <div class="card-body">
         <p><strong>Wholesale Price:</strong>
@@ -35,7 +35,7 @@
 
   <div class="card mb-4">
     <div class="card-header bg-info text-white">
-      <h5 class="card-title mb-0">🎲 Demand Draws</h5>
+      <h5 class="card-title mb-0">Demand Draws</h5>
     </div>
     <div class="card-body">
       <p>Demand was drawn <strong>{{ C.NUM_DEMAND_DRAWS }}</strong> times,
@@ -52,7 +52,7 @@
     {% if player.is_retailer %}
       <div class="card mb-4">
         <div class="card-header bg-light">
-          <h5 class="card-title mb-0">🔍 Quality Checks</h5>
+          <h5 class="card-title mb-0">Quality Checks</h5>
         </div>
         <div class="card-body">
           <p>The Supplier passed
@@ -67,7 +67,7 @@
 
     <div class="card mb-4">
       <div class="card-header bg-light">
-        <h5 class="card-title mb-0">📊 Your Profit</h5>
+        <h5 class="card-title mb-0">Your Profit</h5>
       </div>
       <div class="card-body">
         <p class="mb-0"><strong>Realized Profit:</strong>
@@ -83,7 +83,7 @@
 
   <div class="card border-warning mb-4">
     <div class="card-header bg-warning">
-      <h5 class="card-title mb-0">💰 Your Compensation</h5>
+      <h5 class="card-title mb-0">Your Compensation</h5>
     </div>
     <div class="card-body">
       <p><strong>Baseline payment:</strong> €{{ formatted_baseline }}</p>
