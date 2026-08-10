@@ -65,6 +65,13 @@ class NegotiationBot(BotStrategy):
             'llm_temp': session_config.get('llm_temp', 0.1),
             'llm_reader': session_config.get('llm_reader',
                                              'offer_reader_v2'),
+            # OpenRouter: primary backend when use_open_router is True,
+            # last-resort fallback otherwise (see bot_llm.BotLLM._chat).
+            'use_open_router': session_config.get('use_open_router', False),
+            'open_router_model': session_config.get(
+                'open_router_model', 'nvidia/nemotron-nano-9b-v2:free'),
+            'open_router_api_key': session_config.get(
+                'open_router_api_key', ''),
             # Host flags ("https://...": True) are read from here.
             'session_config': session_config,
             'participant_code': player.participant.code,
