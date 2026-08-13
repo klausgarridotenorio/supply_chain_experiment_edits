@@ -1,5 +1,5 @@
 db.sqlite3
-venv/
+venv
 __pycache__/
 *.pyc
 .DS_Store
@@ -7,3 +7,4 @@ _static_root/
 staticfiles/
 .idea/
 .vscode/
+/experiment/static/experiment/debug/*
