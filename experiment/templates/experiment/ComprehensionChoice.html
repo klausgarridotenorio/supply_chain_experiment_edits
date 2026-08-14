@@ -1,0 +1,42 @@
+{#
+  Qualitative comprehension question (shared by ComprehensionChoiceInfo
+  and ComprehensionChoicePay via template_name): one multiple-choice
+  question rendered by {% formfields %}. A wrong pick returns a page-level
+  error (shown in oTree's standard alert at the top) and the player
+  retries with the identical options.
+#}
+{% block title %}
+  Comprehension Check {{ question_number }}/{{ total_questions }}
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    <!-- Progress Indicator -->
+    <div class="mb-4">
+      <h4 class="text-center">Comprehension Check</h4>
+      <p class="text-center text-muted">Question {{ question_number }} of {{ total_questions }}</p>
+    </div>
+
+    <!-- Question Card -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header border-bottom">
+        <h5 class="mb-0">Choose the Correct Answer</h5>
+      </div>
+      <div class="card-body">
+        {% formfields %}
+      </div>
+    </div>
+
+    {% next_button %}
+  </div>
+
+  <style>
+    .card {
+      border-radius: 8px;
+    }
+    .card-header {
+      border-radius: 8px 8px 0 0 !important;
+      font-weight: 600;
+    }
+  </style>
+{% endblock %}

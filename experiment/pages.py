@@ -3,9 +3,10 @@ Page flow (Two-Human path; the Single-Player path reuses it with the
 Retailer seat idle):
 
   1. Instructions          both            single page of text
-     ComprehensionCheck1-5 every human     5 profit-calculation questions
-                                           (wrong answer -> worked solution
-                                           + fresh values; repo port)
+     ComprehensionCheck1-3 every human     3 profit-calculation questions
+     ComprehensionChoice*  every human     2 multiple-choice questions
+                                           (wrong answer -> error message,
+                                           retry with the SAME terms)
   2. Disclosure            RETAILER only   private-information decision about
                                            the retail price (RP);
      DisclosureWaitPage    both            the Supplier is IDLE here while
@@ -27,7 +28,6 @@ above except Negotiation is skipped; set_opponents runs in creating_session
 instead of the NegotiationWaitPage, and DemoResults closes the session.
 """
 import json
-import random
 import time
 from typing import Any
 
@@ -90,136 +90,130 @@ class Instructions(Page):
 # 1b. Comprehension check (5 profit-calculation questions, repo port)
 ################################################################################
 
-class ComprehensionCheck1(Page):
-    """Profit-calculation comprehension check, ported from the example
-    repository (intro app). Five questions, one page each, shown to EVERY
-    human player right after the Instructions -- in both the Two-Human and
-    the Single-Player game (there the solo Supplier answers them).
+def record_comprehension_answer(player: Player, page_idx: int, answer):
+    """Append the given answer to the player's per-question history."""
+    answers = json.loads(player.comprehension_answer)
+    answers[str(page_idx)].append(answer)
+    player.comprehension_answer = json.dumps(answers)
 
-    A wrong answer keeps the player on the page, shows the full worked
-    solution (see comprehension.py), and regenerates fresh hypothetical
-    prices; quantity and demand are fixed per question (QUANTITY_DEMAND).
-    All answers and attempt counts are recorded on the player.
+
+def record_comprehension_attempt(player: Player, page_idx: int):
+    """Count one failed attempt on the given question."""
+    attempts = json.loads(player.comprehension_attempts)
+    attempts[str(page_idx)] += 1
+    player.comprehension_attempts = json.dumps(attempts)
+
+
+class ComprehensionCheck1(Page):
+    """Profit-calculation comprehension check (questions 1-3, one page
+    each), shown to EVERY human player right after the Instructions -- in
+    both the Two-Human and the Single-Player game (there the solo Supplier
+    answers them).
+
+    The terms of each question are FIXED (TERMS below). A wrong answer
+    keeps the player on the page and shows the full worked solution
+    (see comprehension.py); the player then retries the very SAME
+    question -- nothing is regenerated between attempts. All answers and
+    attempt counts are recorded on the player.
     """
     form_model = 'player'
     form_fields = ['comprehension_check']
     template_name = 'experiment/ComprehensionCheck.html'
 
+    # Questions shown across the whole comprehension check: the 3 fixed
+    # calculation pages here + the 2 multiple-choice pages below.
+    TOTAL_QUESTIONS = 5
+
+    # question index -> (wholesale price w, quantity q, average demand
+    # across the C.NUM_DEMAND_DRAWS draws): mixes over-, under- and
+    # nearly-met demand, so the min(q, D) logic is exercised.
+    TERMS = {
+        1: (2, 90, 10),
+        2: (2, 70, 80),
+        3: (3, 40, 30),
+    }
+    # Hypothetical retail price for a RETAILER's profit questions (the
+    # Supplier's profit formula does not involve the RP). Fixed, like the
+    # terms, so retries always show identical values.
+    HYPOTHETICAL_RP = 4
+
     @staticmethod
     def is_displayed(player: Player) -> bool:
         return not negotiation_only(player)
-
-    # question index -> (quantity, demand): mixes over-, under- and
-    # exactly-met demand, so the min(q, D) logic is exercised.
-    QUANTITY_DEMAND = {
-        1: (10, 90),
-        2: (90, 10),
-        3: (50, 50),
-        4: (70, 80),
-        5: (40, 30),
-    }
 
     @classmethod
     def get_page_idx(cls) -> int:
         return int(cls.__name__[-1])
 
     @classmethod
-    def vars_for_template(cls, player: Player) -> dict[str, Any]:
-        def next_question():
-            # Hypothetical values consistent with THIS game's parameters:
-            # PC is fixed (common knowledge), the retail price is a draw
-            # like the real one (4 or 5), and the wholesale price lies
-            # strictly between the two.
-            market_price = random.randint(config['market_price_low'],
-                                          config['market_price_high'])
-            production_cost = config['production_cost']
-            price = random.randint(production_cost + 1, market_price - 1)
-
-            # Calculate the correct profit based on the player's role
-            quantity_sold = min(quantity, demand)
-            quantity_unsold = max(0, quantity - demand)
-            if player.is_retailer:
-                profit = retailer_profit(market_price, price, quantity_sold)
-            else:
-                profit = supplier_profit(price, production_cost,
-                                         quantity_sold, quantity_unsold)
-
-            return {
-                'market_price': market_price,
-                'production_cost': production_cost,
-                'price': price,
-                'quantity': quantity,
-                'demand': demand,
-                'profit': profit,
-            }
-
-        config = player.session.config
-        var_dict = player.participant.vars
-
-        page_idx = cls.get_page_idx()
-        quantity, demand = cls.QUANTITY_DEMAND[page_idx]
-
-        # Generate new values if first time on this question or after error
-        if page_idx not in var_dict.keys():
-            var_dict[page_idx] = next_question()
-
+    def _question(cls, player: Player) -> dict[str, Any]:
+        """The (deterministic) question shown on this page, including the
+        correct profit for the player's role."""
+        price, quantity, demand = cls.TERMS[cls.get_page_idx()]
+        production_cost = player.session.config['production_cost']
+        quantity_sold = min(quantity, demand)
+        quantity_unsold = max(0, quantity - demand)
+        if player.is_retailer:
+            profit = retailer_profit(cls.HYPOTHETICAL_RP, price,
+                                     quantity_sold)
+        else:
+            profit = supplier_profit(price, production_cost,
+                                     quantity_sold, quantity_unsold)
         return {
-            'market_price': var_dict[page_idx]['market_price'],
-            'production_cost': var_dict[page_idx]['production_cost'],
-            'price': var_dict[page_idx]['price'],
-            'quantity': var_dict[page_idx]['quantity'],
-            'demand': var_dict[page_idx]['demand'],
-            'question_number': page_idx,
-            'total_questions': len(cls.QUANTITY_DEMAND),
+            'market_price': cls.HYPOTHETICAL_RP,
+            'production_cost': production_cost,
+            'price': price,
+            'quantity': quantity,
+            'demand': demand,
+            'quantity_sold': quantity_sold,
+            'quantity_unsold': quantity_unsold,
+            'profit': profit,
+        }
+
+    @classmethod
+    def vars_for_template(cls, player: Player) -> dict[str, Any]:
+        question = cls._question(player)
+        return {
+            'market_price': question['market_price'],
+            'production_cost': question['production_cost'],
+            'price': question['price'],
+            'quantity': question['quantity'],
+            'demand': question['demand'],
+            'question_number': cls.get_page_idx(),
+            'total_questions': cls.TOTAL_QUESTIONS,
         }
 
     @classmethod
     def error_message(cls, player: Player, values) -> str | None:
         """Validate the answer; on a mistake, show the worked solution and
-        regenerate the question values (repo logic)."""
-        var_dict = player.participant.vars
-
+        let the player retry the SAME question (terms never change)."""
         page_idx = cls.get_page_idx()
-        comprehension_attempts = json.loads(player.comprehension_attempts)
-        page_attempts = comprehension_attempts[str(page_idx)]
+        question = cls._question(player)
 
         answer = values['comprehension_check']
-        correct = var_dict[page_idx]['profit']
+        correct = question['profit']
 
-        # Store answer
-        comprehension_answer = json.loads(player.comprehension_answer)
-        comprehension_answer[str(page_idx)].append(answer)
-        player.comprehension_answer = json.dumps(comprehension_answer)
-
+        record_comprehension_answer(player, page_idx, answer)
         if answer == correct:
             return None
-
-        # Increase the number of attempts
-        comprehension_attempts[str(page_idx)] = page_attempts + 1
-        player.comprehension_attempts = json.dumps(comprehension_attempts)
-
-        # Pop question and clear for new generation
-        question = var_dict.pop(page_idx)
-
-        market_price = question['market_price']
-        price = question['price']
-        production_cost = question['production_cost']
-        quantity = question['quantity']
-        demand = question['demand']
-        quantity_sold = min(quantity, demand)
-        quantity_unsold = max(0, quantity - demand)
+        record_comprehension_attempt(player, page_idx)
 
         if player.is_retailer:
             profit_calc = RETAILER_PROFIT_CALC % (
-                market_price, price, quantity_sold, correct)
+                question['market_price'], question['price'],
+                question['quantity_sold'], correct)
         else:
             profit_calc = SUPPLIER_PROFIT_CALC % (
-                price, production_cost, quantity_sold,
-                production_cost, quantity_unsold, correct)
+                question['price'], question['production_cost'],
+                question['quantity_sold'], question['production_cost'],
+                question['quantity_unsold'], correct)
 
         return get_error_message(player, profit_calc,
-                                 market_price, price, production_cost,
-                                 quantity, demand)
+                                 question['market_price'],
+                                 question['price'],
+                                 question['production_cost'],
+                                 question['quantity'],
+                                 question['demand'])
 
 
 class ComprehensionCheck2(ComprehensionCheck1):
@@ -230,12 +224,75 @@ class ComprehensionCheck3(ComprehensionCheck1):
     pass
 
 
-class ComprehensionCheck4(ComprehensionCheck1):
-    pass
+class ComprehensionChoiceInfo(Page):
+    """Qualitative comprehension question 4: the information structure of
+    the game (the RP draw domain, who knows what, and the Retailer's
+    disclosure options). One radio choice; a wrong pick shows an error and
+    the player retries with the identical options."""
+    form_model = 'player'
+    form_fields = ['comprehension_info']
+    template_name = 'experiment/ComprehensionChoice.html'
+
+    QUESTION_IDX = 4
+    CORRECT_CHOICE = 'rp_4_or_5_disclosure_free'
+
+    @staticmethod
+    def is_displayed(player: Player) -> bool:
+        return not negotiation_only(player)
+
+    @classmethod
+    def vars_for_template(cls, player: Player) -> dict[str, Any]:
+        return {
+            'question_number': cls.QUESTION_IDX,
+            'total_questions': ComprehensionCheck1.TOTAL_QUESTIONS,
+        }
+
+    @classmethod
+    def error_message(cls, player: Player, values) -> str | None:
+        answer = values[cls.form_fields[0]]
+        record_comprehension_answer(player, cls.QUESTION_IDX, answer)
+        if answer == cls.CORRECT_CHOICE:
+            return None
+        record_comprehension_attempt(player, cls.QUESTION_IDX)
+        return ('Oops! That is not the correct description. Please '
+                're-read the instructions about the Retail Price, the '
+                'disclosure decision, and the Production Cost, then try '
+                'again.')
 
 
-class ComprehensionCheck5(ComprehensionCheck1):
-    pass
+class ComprehensionChoicePay(Page):
+    """Qualitative comprehension question 5: the profit-share component of
+    the compensation. The correct percentage is derived from the session
+    config (profit_share), so the question always matches the actual
+    payment rule."""
+    form_model = 'player'
+    form_fields = ['comprehension_pay']
+    template_name = 'experiment/ComprehensionChoice.html'
+
+    QUESTION_IDX = 5
+
+    @staticmethod
+    def is_displayed(player: Player) -> bool:
+        return not negotiation_only(player)
+
+    @classmethod
+    def vars_for_template(cls, player: Player) -> dict[str, Any]:
+        return {
+            'question_number': cls.QUESTION_IDX,
+            'total_questions': ComprehensionCheck1.TOTAL_QUESTIONS,
+        }
+
+    @classmethod
+    def error_message(cls, player: Player, values) -> str | None:
+        answer = values[cls.form_fields[0]]
+        record_comprehension_answer(player, cls.QUESTION_IDX, answer)
+        share = player.session.config['profit_share']
+        if answer == f"{share * 100:g}%":
+            return None
+        record_comprehension_attempt(player, cls.QUESTION_IDX)
+        return ('Oops! That is not the correct percentage. Please check '
+                'the compensation description in the instructions and try '
+                'again.')
 
 
 ################################################################################
@@ -701,8 +758,8 @@ page_sequence = [
     ComprehensionCheck1,
     ComprehensionCheck2,
     ComprehensionCheck3,
-    ComprehensionCheck4,
-    ComprehensionCheck5,
+    ComprehensionChoiceInfo,
+    ComprehensionChoicePay,
 
     Disclosure,
     DisclosureWaitPage,

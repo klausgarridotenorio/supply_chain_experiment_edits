@@ -315,10 +315,44 @@ class Player(BasePlayer):
     is_active = models.BooleanField(initial=False)
 
     # ── Comprehension check (5 questions right after the Instructions;
-    #    every HUMAN player, in both game versions; repo port) ────────────
-    # The current answer field (one page per question, values regenerate
-    # after a wrong answer).
+    #    every HUMAN player, in both game versions: 3 fixed calculation
+    #    questions + 2 qualitative multiple-choice questions) ─────────────
+    # The calculation answer field (one page per question; the terms are
+    # FIXED -- a wrong answer keeps the very same question).
     comprehension_check = models.FloatField(min=-999999999)
+
+    # Multiple-choice question 4: the information structure of the game
+    # (RP draw domain + who knows what + the disclosure options).
+    comprehension_info = models.StringField(
+        widget=widgets.RadioSelect,
+        label='Which statement correctly describes the information in '
+              'this game?',
+        choices=[
+            ['rp_public_pc_private',
+             'The Retail Price is known to both parties from the start, '
+             "while the Production Cost is the Retailer's private "
+             'information.'],
+            ['rp_4_or_5_disclosure_free',
+             'The Retail Price (RP) is either €4 or €5 and the Supplier '
+             'does not know the drawn value; the Retailer can choose to '
+             'disclose 4, disclose 5, or disclose nothing. The Production '
+             'Cost (PC) is known to everyone.'],
+            ['rp_any_value_true_disclosure',
+             'The Retail Price can take any value between €1 and €10, and '
+             'the Retailer must always disclose its true value.'],
+            ['pc_secret',
+             'The Production Cost is secret, and the Supplier has to '
+             'discover it during the negotiation.'],
+        ],
+    )
+    # Multiple-choice question 5: the profit-share component of the
+    # compensation (correct answer derived from config profit_share).
+    comprehension_pay = models.StringField(
+        widget=widgets.RadioSelect,
+        label="On top of your baseline payment, what percentage of your "
+              "company's realized profit do you receive as a bonus?",
+        choices=['2%', '3%', '5%', '10%'],
+    )
     # Full answer history / attempt counters per question, JSON-encoded
     # (kept as LongStringFields exactly like the example repository).
     comprehension_answer = LongStringField(
