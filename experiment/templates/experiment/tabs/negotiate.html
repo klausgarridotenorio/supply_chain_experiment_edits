@@ -1,7 +1,9 @@
-{# Negotiate tab -- migrated unchanged from the example repository
-   (templates/negotiate.html). The chat is non-official; only offers sent
-   through the interface table below are official. #}
-{% include 'experiment/tabs/prices.html' %}
+{# Chat + offer interface (left column of the single-screen Negotiation
+   layout; the market-parameter banner is included by Negotiation.html
+   above the instructions box). The chat is non-official; only offers sent
+   through the interface table below are official. TEST offer copies the
+   counterpart's standing proposal into the Decision Support Tool on the
+   right, so the deal on the table can be inspected before CONFIRM. #}
 <h4>Chat</h4>
 <div class='otree-chat'>
   <div class='otree-chat__messages' id='chat-output'></div>
@@ -24,6 +26,10 @@
     <td>
       <button type="button" id="btnAccept" onclick="sendAccept()" disabled>
         CONFIRM
+      </button>
+      <button type="button" id="btnTest" onclick="testOffer()" disabled
+              title="Preview this deal in the Decision Support Tool">
+        TEST offer
       </button>
     </td>
   </tr>

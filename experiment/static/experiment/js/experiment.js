@@ -9,6 +9,10 @@ const otherProposal = document.getElementById('otherProposal');
 const btnChat = document.getElementById("btn-chat");
 const btnOffer = document.getElementById("btn-offer");
 const btnAccept = document.getElementById('btnAccept');
+// TEST offer: enabled/disabled together with CONFIRM (both act on the
+// counterpart's standing proposal; handler testOffer() lives in
+// analysis.js next to the DSS it feeds).
+const btnTest = document.getElementById('btnTest');
 
 document.addEventListener('DOMContentLoaded', () => {
   if (js_vars.bot_opponent === true) {
@@ -29,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnOffer.disabled = true;
   if (!otherProposal.innerHTML.includes('none')) {
     btnAccept.disabled = false;
+    btnTest.disabled = false;
   }
 
   // Set the timer color to red if 30 seconds left
@@ -219,6 +224,7 @@ function sendAccept() {
   btnChat.disabled = true;
   btnOffer.disabled = true;
   btnAccept.disabled = true;
+  btnTest.disabled = true;
 
   let proposal = otherProposal.innerHTML;
   let price = parseFloat(proposal.split('<br>')[0].replace('€', ''));
@@ -238,6 +244,7 @@ function receiveoffers(offers) {
       } else {
         otherProposal.innerHTML = innerHTML;
         btnAccept.disabled = false;
+        btnTest.disabled = false;
       }
     }
   });

@@ -343,7 +343,8 @@ class NegotiationWaitPage(WaitPage):
 
 class Negotiation(Page):
     """Live negotiation: free-form chat plus binding price/quantity offers,
-    with the Decision Support Tool on a separate tab.
+    with the Decision Support Tool always visible on the right half of the
+    single-screen layout (no tabs; see Negotiation.html).
 
     Timer-reset rule: once the countdown has dropped below
     TIMER_RESET_SECONDS, every NEW binding offer (from either player)
@@ -378,6 +379,13 @@ class Negotiation(Page):
             group.negotiation_start_epoch = time.time()
         # Timeout without an accepted offer = no deal (impasse).
         return player.session.config['timeout_negotiation']
+
+    @staticmethod
+    def vars_for_template(player: Player) -> dict[str, Any]:
+        # The collapsible how-to box above the chat starts OPEN in the
+        # negotiation-only demo (no Instructions page preceded it) and
+        # collapsed in the full experiment (participants just read them).
+        return {'instructions_start_open': negotiation_only(player)}
 
     @staticmethod
     def js_vars(player: Player) -> dict[str, Any]:

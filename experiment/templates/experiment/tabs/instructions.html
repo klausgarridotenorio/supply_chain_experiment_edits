@@ -1,8 +1,7 @@
-{# How-to tab -- migrated from the example repository
+{# How-to text -- migrated from the example repository
    (templates/instructions.html), with the delegation/AI-specific wording
-   kept behind the bot_opponent flag (inert in the Two-Human game). #}
-<h5>How to Use the Interface</h5>
-<br>
+   kept behind the bot_opponent flag (inert in the Two-Human game).
+   Shown inside the collapsible box above the chat (see Negotiation.html). #}
 <h6>Official vs. Non-Official Agreements</h6>
 <p>
   Chat messages are <strong>non-official</strong>. Only offers
@@ -26,7 +25,7 @@
 <p>
   Use <strong>"Your Current Proposal"</strong> to send official offers.
 </p>
-<p><strong>IMPORTANT</strong> when the 5 min countdown is below 30 seconds you can re-set it back to 30 seconds by sending an official offer.</p>
+<p><strong>IMPORTANT</strong> when the countdown is below 30 seconds you can re-set it back to 30 seconds by sending an official offer.</p>
 {% if player.is_retailer %}
   <p class="alert alert-warning">
     <strong>Important:</strong> Don't accept a wholesale price above
@@ -34,8 +33,9 @@
   </p>
 {% endif %}
 <br>
-<h6>Next Steps</h6>
+<h6>On This Screen</h6>
 <ul>
-  <li>Go to <strong>Negotiate</strong> page to start chatting with your counterpart and to <strong>send/receive offers</strong></li>
-  <li>Visit <strong>Profit Analysis</strong> page to <strong>automatically retrieve the expected profitability</strong> of an offer for you and your counterpart </li>
+  <li>Use the <strong>chat</strong> below to negotiate with your counterpart, and the <strong>Interface</strong> under it to <strong>send/receive official offers</strong></li>
+  <li>Use the <strong>Decision Support System</strong> on the right to test Wholesale Price and Quantity combinations <strong>before sending an offer</strong></li>
+  <li>Click <strong>TEST offer</strong> (next to CONFIRM) to preview the <strong>expected profitability of the deal currently on the table</strong></li>
 </ul>

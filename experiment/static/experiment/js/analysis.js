@@ -46,6 +46,27 @@ function onAnalysisInputChanged() {
   }
 }
 
+// "TEST offer" button in the interface table: copy the counterpart's
+// standing proposal into the DSS inputs and plot it immediately, so the
+// impact of the deal on the table can be inspected before CONFIRM. The
+// hypothetical RP stays whatever is selected in the dropdown.
+function testOffer() {
+  const proposal = document.getElementById('otherProposal');
+  if (!proposal) {
+    return;
+  }
+  // Same parsing as sendAccept (experiment.js): "€ <price><br><quantity>".
+  const parts = proposal.innerHTML.split('<br>');
+  const price = parseFloat(parts[0].replace('€', ''));
+  const quantity = parseInt(parts[1]);
+  if (isNaN(price) || isNaN(quantity)) {
+    return;
+  }
+  analysisPrice.value = price;
+  analysisQuantity.value = quantity;
+  onAnalysisInputChanged();
+}
+
 function updateDisplayProfitsButton() {
   if (analysisPrice && analysisQuantity && btnDisplayProfits) {
     const priceValue = parseFloat(analysisPrice.value);

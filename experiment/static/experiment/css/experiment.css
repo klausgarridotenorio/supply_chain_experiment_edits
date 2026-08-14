@@ -2,15 +2,13 @@
   display: none;
 }
 
-/* Countdown panel: fixed to the left edge at mid-height, so it stays in
-   view on every tab (Instructions / Negotiate / Profit Analysis) and
-   while scrolling. The JS hooks stay on .time-left (red under 30s) and
+/* Countdown panel: fixed to the TOP-LEFT of the screen, in view while
+   scrolling. The JS hooks stay on .time-left (red under 30s) and
    .otree-timer__time-left (countdown), so only presentation changes. */
 .time-left {
   position: fixed;
   left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 12px;
   z-index: 1050;
   margin: 0;
   width: 120px;
@@ -31,13 +29,61 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Narrow screens: the centered content column has no free left margin, so
-   a left panel would cover it; dock the timer to the top-left instead
-   (still fixed while scrolling). */
+/* ── Single-screen layout ─────────────────────────────────────────────
+   Widen oTree's centered container to (almost) the full window and
+   reserve a left gutter for the fixed clock; left column = instructions
+   + chat + offer interface, right column = the Decision Support Tool. */
+.otree-body.container {
+  /* Bootstrap sets width: 100%; with the left gutter that would overflow
+     the viewport, so let the block size itself between the margins. */
+  width: auto;
+  max-width: none;
+  margin-left: 150px;
+  margin-right: 24px;
+}
+
+.nego-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.nego-left {
+  flex: 1 1 52%;
+  min-width: 0;
+}
+
+/* Sticky: the DST stays in view while the (longer) left column scrolls. */
+.nego-right {
+  flex: 1 1 48%;
+  min-width: 0;
+  position: sticky;
+  top: 12px;
+}
+
+.nego-instructions {
+  margin-bottom: 1rem;
+}
+
+.nego-instructions > button.card-header {
+  width: 100%;
+  border-radius: 0;
+}
+
+/* Narrow screens: stack the two columns; compact clock docked top-left. */
 @media (max-width: 1100px) {
+  .otree-body.container {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .nego-layout {
+    display: block;
+  }
+  .nego-right {
+    position: static;
+    margin-top: 24px;
+  }
   .time-left {
-    top: 8px;
-    transform: none;
     width: auto;
     padding: 6px 10px;
   }
@@ -74,7 +120,7 @@ pre {
 }
 
 .otree-chat__messages {
-    height: 500px;
+    height: 340px;
     overflow: auto;
     background: #eee;
     margin: 2px 0 5px 0;
@@ -83,11 +129,17 @@ pre {
 .otree-chat__nickname {
     display: inline-block;
     color: #C07A36;
-    width: 150px;
+    width: 120px;
     font-weight: bold;
+    vertical-align: top;
 }
 
 .otree-chat__body {
-  max-width: 775px;
+  max-width: calc(100% - 130px);
   display: inline-flex;
+}
+
+/* The input + Send button share the chat box width in the left column. */
+.otree-chat__input {
+  width: calc(100% - 70px);
 }

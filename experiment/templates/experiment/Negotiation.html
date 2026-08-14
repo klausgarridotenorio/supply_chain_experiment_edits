@@ -1,7 +1,10 @@
 {#
-  Negotiation page -- migrated from the example repository's Experiment.html.
-  Three tabs: how-to instructions, the negotiation interface (chat + official
-  offers), and the Decision Support Tool ("Profit Analysis").
+  Negotiation page -- single-screen layout (no tabs).
+  Left column: market-parameter banner, collapsible how-to box, the chat,
+  and below it the interface for official offers (CONFIRM / TEST offer /
+  send). Right column: the Decision Support Tool, always visible, so
+  price/quantity combinations can be tested while negotiating.
+  The countdown clock is fixed to the top-left of the screen.
 #}
 {% block styles %}
   <link rel="stylesheet" type="text/css"
@@ -26,50 +29,36 @@
     Time left <span class="otree-timer__time-left"></span>
   </h4>
 
-  <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button
-          class="nav-link active"
-          id="pills-instructions-tab" data-bs-toggle="pill"
-          data-bs-target="#pills-instructions" type="button" role="tab"
-          aria-controls="pills-instructions" aria-selected="true">
-        Instructions
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button
-          class="nav-link"
-          id="pills-negotiate-tab" data-bs-toggle="pill"
-          data-bs-target="#pills-negotiate" type="button" role="tab"
-          aria-controls="pills-negotiate" aria-selected="false">
-        Negotiate
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="pills-analysis-tab" data-bs-toggle="pill"
-              data-bs-target="#pills-analysis" type="button" role="tab"
-              aria-controls="pills-analysis" aria-selected="false">
-        Profit Analysis
-      </button>
-    </li>
-  </ul>
+  <div class="nego-layout">
 
-  <div class="tab-content" id="pills-tabContent">
-    <div
-        class="tab-pane fade show active"
-        id="pills-instructions" role="tabpanel"
-        aria-labelledby="pills-instructions-tab">
-      {% include 'experiment/tabs/instructions.html' %}
-    </div>
-    <div
-        class="tab-pane fade"
-        id="pills-negotiate" role="tabpanel"
-        aria-labelledby="pills-negotiate-tab">
+    {# ── Left column: prices, instructions, chat, offer interface ───── #}
+    <div class="nego-left">
+      {% include 'experiment/tabs/prices.html' %}
+
+      <div class="card nego-instructions">
+        <button class="btn card-header text-start fw-bold" type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#instructionsCollapse"
+                aria-controls="instructionsCollapse"
+                aria-expanded="{% if instructions_start_open %}true{% else %}false{% endif %}">
+          &#128214; How to Use the Interface
+          <span class="float-end">&#9662;</span>
+        </button>
+        <div class="collapse{% if instructions_start_open %} show{% endif %}"
+             id="instructionsCollapse">
+          <div class="card-body">
+            {% include 'experiment/tabs/instructions.html' %}
+          </div>
+        </div>
+      </div>
+
       {% include 'experiment/tabs/negotiate.html' %}
     </div>
-    <div class="tab-pane fade" id="pills-analysis" role="tabpanel"
-         aria-labelledby="pills-analysis-tab">
+
+    {# ── Right column: the Decision Support Tool ─────────────────────── #}
+    <div class="nego-right">
       {% include 'experiment/tabs/analysis.html' %}
     </div>
+
   </div>
 {% endblock %}
