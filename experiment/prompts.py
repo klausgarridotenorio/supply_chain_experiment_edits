@@ -258,8 +258,9 @@ def not_profitable_prompt(user_message: str, optimal_offer_str: str,
             _history_block(interactions_bot, interactions_user))
 
 
-def offer_invalid_prompt(user_message: str) -> str:
+def offer_invalid_prompt(user_message: str, optimal_offer_str: str,) -> str:
     prompts = PROMPTS['retailer']
     return (prompts['follow_up_invalid_offer'] +
             user_message + ' ' +
-            prompts['invalid_offer_reminder'])
+            prompts['invalid_offer_reminder']+
+            optimal_offer_str)

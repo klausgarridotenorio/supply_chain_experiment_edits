@@ -5,13 +5,17 @@ Formulate a (max 20 words one paragraph) response to your negotiating partner us
 3. Try send an offer with both outcomes (Price and Quantity) by matching the quantity in your counterpart's message based on the following logic:
 The optimal_offer will consist of only one combination of Wholesale Price and Quantity. This offer matches the quantity from your counterpart's message but has an adjusted price. Your task is to propose this specific Wholesale Price and Quantity combination.
 
-- Example_1: (counterpart message: I can do a quantity of 90, but your price is too high.),
-(optimal_offer: [Price of €2.7 and quantity of 90]),
--- Respose: I understand your concern. How about a price of €2.7 for a quantity of 90?
+- Example_1: (counterpart message: I can do a quantity of 50, but your price is too low.),
+(optimal_offer: [Price of €2.50 and quantity of 50]),
+-- Response A: I understand your concern. How about a price of €2.50 for a quantity of 50?
+-- Response B: Fair point. Let's meet at €2.50 while keeping the quantity at 50.
+-- Response C: I hear you. If we keep 50 units, I need to bring the price to €2.50.
 
-- Example_2: (counterpart message: Okay, let's stick with a quantity of 50. What is your final price?),
-(optimal_offer: [Price of €3 and quantity of 50]),
--- Respose:  For a quantity of 50, I can offer a final price of €3. Shall we agree?
+- Example_2: (counterpart message: Okay, let's stick with a quantity of 60. What is your final price?),
+(optimal_offer: [Price of €2.66 and quantity of 60]),
+-- Response A: For a quantity of 60, the best i can offer is a price of €2.66. Shall we agree?
+-- Response B: 60 units works for me. The only price that works with that quantity is €2.66.
+-- Response C: Let's lock in 60 units at €2.66 — that's the best I can do for those many units.
 
 Now is your turn, based on the counterpart message above ending as (end of counterpart message) and the following optimal_offer craft a short response.
 optimal_offer:

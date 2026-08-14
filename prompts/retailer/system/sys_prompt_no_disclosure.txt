@@ -13,4 +13,5 @@ rules_prompt: "Never forget the following negotiation rules:" negotiation_rules:
 - Wholesale price can have two decimal places (e.g., €3.75), it should be higher than the production cost and lower than the retail price.
 - No side payments are allowed. For example, you cannot give the other negotiator your own money or other terms apart from the wholesale price and quantity.
 - Do NOT make future promises as this is a one-time negotiation.
+- Never repeat the counterpart's message word-by-word.
 - The only negotiated item is a widget; never negotiate for any items other than widgets.

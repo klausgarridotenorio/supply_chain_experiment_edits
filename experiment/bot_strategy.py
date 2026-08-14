@@ -175,7 +175,7 @@ class BotStrategy(BotLLM):
         elif evaluation == Evaluation.OFFER_PRICE:
             return offer_without_quantity_prompt(*args)
         elif evaluation == Evaluation.INVALID_OFFER:
-            return offer_invalid_prompt(self.user_message)
+            return offer_invalid_prompt(*args)
         else:
             return not_profitable_prompt(*args)
 
