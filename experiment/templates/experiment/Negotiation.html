@@ -6,15 +6,19 @@
   price/quantity combinations can be tested while negotiating.
   The countdown clock is fixed to the top-left of the screen.
 #}
+{# The ?v= query is a cache buster: bump it whenever these files change,
+   so browsers that cached an older version refetch them (otherwise the
+   page renders with stale CSS/JS -- e.g. no side-by-side split and a
+   dead TEST offer button). #}
 {% block styles %}
   <link rel="stylesheet" type="text/css"
-        href="{% static "experiment/css/experiment.css" %}"/>
+        href="{% static "experiment/css/experiment.css" %}?v=2"/>
 {% endblock %}
 
 {% block scripts %}
-  <script src="{% static 'experiment/js/chart.js' %}"></script>
-  <script src="{% static 'experiment/js/analysis.js' %}"></script>
-  <script src="{% static 'experiment/js/experiment.js' %}"></script>
+  <script src="{% static 'experiment/js/chart.js' %}?v=2"></script>
+  <script src="{% static 'experiment/js/analysis.js' %}?v=2"></script>
+  <script src="{% static 'experiment/js/experiment.js' %}?v=2"></script>
 {% endblock %}
 
 {% block title %}
