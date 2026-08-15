@@ -301,7 +301,7 @@ function updateProfitDetails(graph_price, graph_quantity, expectedDemand, expect
   let html = `
     <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
       <h5>Analysis for RP: €${selectedRetailPrice().toFixed(2)}, Price: €${graph_price.toFixed(2)}, Quantity: ${graph_quantity}</h5>
-      <p><strong>Expected Demand:</strong> ${expectedDemand.toFixed(2)} units</p>
+      <p><strong>Expected Units Sold:</strong> ${expectedDemand.toFixed(2)} units</p>
     </div>
     
     <div style="display: flex; gap: 20px; margin-bottom: 15px;">
