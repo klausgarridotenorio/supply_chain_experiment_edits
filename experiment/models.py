@@ -344,6 +344,7 @@ class Player(BasePlayer):
              'The Production Cost is secret, and the Supplier has to '
              'discover it during the negotiation.'],
         ],
+        max_length=256
     )
     # Multiple-choice question 5: the profit-share component of the
     # compensation (correct answer derived from config profit_share).
@@ -352,6 +353,7 @@ class Player(BasePlayer):
         label="On top of your baseline payment, what percentage of your "
               "company's realized profit do you receive as a bonus?",
         choices=['2%', '3%', '5%', '10%'],
+        max_length=256
     )
     # Full answer history / attempt counters per question, JSON-encoded
     # (kept as LongStringFields exactly like the example repository).
