@@ -325,12 +325,11 @@ class Player(BasePlayer):
     # (RP draw domain + who knows what + the disclosure options).
     comprehension_info = models.StringField(
         widget=widgets.RadioSelect,
-        label='Which statement correctly describes the information in '
-              'this game?',
+        label='Which statement correctly describes the private information disclosure?',
         choices=[
             ['rp_public_pc_private',
              'The Retail Price is known to both parties from the start, '
-             "while the Production Cost is the Retailer's private "
+             "while the Production Cost is the Supplier's private "
              'information.'],
             ['rp_4_or_5_disclosure_free',
              'The Retail Price (RP) is either €4 or €5 and the Supplier '
@@ -338,10 +337,10 @@ class Player(BasePlayer):
              'disclose 4, disclose 5, or disclose nothing. The Production '
              'Cost (PC) is known to everyone.'],
             ['rp_any_value_true_disclosure',
-             'The Retail Price can take any value between €1 and €10, and '
-             'the Retailer must always disclose its true value.'],
+             'The Retail Price can take any value between €4 and €10, and '
+             'the Retailer may not disclose its true value.'],
             ['pc_secret',
-             'The Production Cost is secret, and the Supplier has to '
+             'The Production Cost is secret, and the Retailer has to '
              'discover it during the negotiation.'],
         ],
         max_length=256
