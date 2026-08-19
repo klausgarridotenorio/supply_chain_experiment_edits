@@ -20,8 +20,10 @@ otree devserver
 (Or recreate the environment with `python3 -m venv venv && venv/bin/pip
 install -r requirements.txt`.)
 
-Then open the demo session **"Supplier-Retailer Negotiation (Two Human
-Players)"** with two browser windows.
+Then open either fixed-price two-human demo session with two browser windows:
+
+* **"Supplier-Retailer Negotiation (Two Human Players) -- RP=5"**
+* **"Supplier-Retailer Negotiation (Two Human Players) -- RP=4"**
 
 ## Game flow (Two-Human path)
 
@@ -37,7 +39,7 @@ Players)"** with two browser windows.
 ## Where things live
 
 ```
-settings.py                  session configs (two_human_negotiation / single_player_ai stub)
+settings.py                  session configs (two-human RP=4/RP=5 / AI treatments)
 common.py                    JsonField helper + base profit functions (UI/DST formulas)
 experiment/
   constants.py               roles (ROLE_RETAILER_EMPLOYEE, ROLE_SUPPLIER_EMPLOYEE),
@@ -67,6 +69,8 @@ by `static/experiment/js/effort_task.js` via hidden form inputs, saved on
 the normal form submission -- also when leaving early):
 
 * `effort_put_number_of_sliders` -- sliders exactly on target at submission,
+* `effort_put_number_of_sliders_moved` -- distinct sliders moved away from 0
+  at least once (moving one back to 0 does not remove it from this count),
 * `effort_put_time_on_sliders` -- seconds spent on the page,
 * `effort_put_relative_time_on_sliders` -- JSON array of ms-since-page-load
   at which each successive slider was durably placed (500 ms debounce;

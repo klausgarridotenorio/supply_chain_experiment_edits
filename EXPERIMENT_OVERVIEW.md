@@ -25,8 +25,9 @@ their own realized profit** (no negative bonus).
 
 ## Two game modes
 
-- **Two-Human game** (`two_human_negotiation`): a real Retailer (id 1) and
-  Supplier (id 2) are paired.
+- **Two-Human game** (`two_human_negotiation` for RP=5 or
+  `two_human_negotiation_rp4` for RP=4): a real Retailer (id 1) and Supplier (id 2)
+  are paired, with RP fixed at 5 or 4 by the selected treatment.
 - **Single-Player game** (5 `ai_*` configs): every human is a **Supplier**
   negotiating against an **AI Retailer** bot. RP is fixed per treatment and
   the bot's disclosure behavior is scripted: RP=5 × {truthful, lie→4, none}

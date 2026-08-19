@@ -90,8 +90,8 @@
         </li>
         <li>
           The item is sold by the retailer company at a Retail Price
-          <strong>(RP)</strong> of {{ retail_prices }}, drawn with equal
-          probability. <strong>Only the Retailer knows the drawn RP.</strong>
+          <strong>(P)</strong> of {{ retail_prices }}, drawn with equal
+          probability. <strong>Only the Retailer knows the drawn P.</strong>
         </li>
         <li>
           Before the negotiation, the Retailer decides what to communicate
@@ -188,16 +188,13 @@
 
       <h6 class="mb-3">Retailer Profit</h6>
       <div class="formula-box">
-        <strong>Retailer Profit = (RP - w) * min(q, D)</strong>
+        <strong>Retailer Profit = (P - w) * min(q, D)</strong>
       </div>
       <p><strong>Example:</strong></p>
-      <p>The Retail Price (RP) is €4, and the parties agreed on a
+      <p>The Retail Price (P) is €4, and the parties agreed on a
         wholesale price (w) of €3 and a quantity (q) of 50:</p>
       <div class="example-box">
         <ul class="mb-0">
-          <li>
-            Demand (D) is 75: (4-3) * min(50, 75) = €50
-          </li>
           <li>
             Demand (D) is 25: (4-3) * min(50, 25) = €25
           </li>
@@ -223,7 +220,7 @@
         </li>
         <li>
           Each passed quality check increases the Retail Price
-          <strong>(RP)</strong> by <strong>€{{ quality_rp_per_slider }}</strong>,
+          <strong>(P)</strong> by <strong>€{{ quality_rp_per_slider }}</strong>,
           up to a maximum increase of
           <strong>€{{ quality_rp_max }}</strong>
           ({{ C.NUM_SLIDERS }} sliders).
@@ -231,7 +228,7 @@
         <li>
           <strong>Be aware:</strong> a higher Retail Price benefits
           <strong>only the Retailer's</strong> profit
-          (RP does not enter the Supplier's profit formula). The Retailer
+          (P does not enter the Supplier's profit formula). The Retailer
           can therefore earn more the better the Supplier performs on the
           task; the Supplier's own earnings are not affected by it.
         </li>
@@ -259,8 +256,8 @@
           strike: you earn
           <strong>{{ profit_share_pct }}% of your realized profit</strong>
           from that deal, computed <strong>after the demand is drawn</strong>
-          (Supplier: w * min(q, D) - PC * q; Retailer: (RP - w) * min(q, D),
-          where RP includes the quality-check increases).
+          (Supplier: w * min(q, D) - PC * q; Retailer: (P - w) * min(q, D),
+          where P includes the quality-check increases).
         </li>
         <li>
           A negative profit earns no bonus (your payment never falls below
@@ -274,6 +271,15 @@
             retailer earns <strong>{{ profit_share_pct }}% of the Retailer
             profit</strong> realized from the deal the AI reaches.
           </li>
+
+          {% else %}
+
+          <li>
+            In the same way that the Supplier earns
+            {{ profit_share_pct }}% of the deal profit, the Retailer also earns 
+            {{ profit_share_pct }}% of the deal profit.
+          </li>
+
         {% endif %}
         <li>
           You have {{ timeout_minutes }} minutes to reach an agreement. If the

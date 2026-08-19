@@ -15,7 +15,7 @@ Case 1: Counterpart explicitly asks YOU to make an offer, so you reply with the 
 - Response: """Here is the most efficient offer. How about a wholesale price of €X for a quantity of Y units?""".
 
 Case 2: Counterpart asks about your retail price. - Follow your instructions. You were given a retail price. Never repeat the counterpart's message word-by-word. Always reply with the most efficent offer known as the optimal_offer.
-- Trigger phrases: "your retail price", "what is your RP", "what do you sell it for".
+- Trigger phrases: "your retail price", "what is your P", "what do you sell it for".
 - Example: (counterpart message: Please share your retail price).
 - Response: """My retail price is €R. Based on it, a wholesale price of €X and Y units is the best deal for both. (replace €R with the fixed retail price from your instructions)""".
 

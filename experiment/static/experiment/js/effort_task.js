@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const MIN = js_vars.slider_min;
   const MAX = js_vars.slider_max;
   const COLS = js_vars.cols;
+  // Stagger the desktop columns vertically: the middle column begins one
+  // row later and the right column begins two rows later. This leaves one
+  // and two empty positions at the top, respectively, while retaining all
+  // sliders at the bottom of their original columns.
+  const COLUMN_ROW_SHIFTS = [0, 1, 2];
   // Horizontal per-row offsets (from the reference implementation) so the
   // sliders cannot be visually aligned across rows.
   const OFFSETS = [0, 14, 32, 6, 24, 10, 0, 28, 12, 34, 4, 20];
@@ -31,6 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Hidden oTree form inputs (names match EffortTask.form_fields).
   const fieldScore =
       document.getElementById('id_effort_put_number_of_sliders');
+  const fieldMoved = document.getElementById(
+      'id_effort_put_number_of_sliders_moved');
   const fieldTime =
       document.getElementById('id_effort_put_time_on_sliders');
   const fieldPacing =
@@ -43,7 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const pacingTimestamps = [];
   const sliderTimers = {};  // per-slider debounce timers
   const onTarget = new Array(N).fill(0);
+  const hasMoved = new Array(N).fill(false);
   let score = 0;
+  let movedCount = 0;
 
   totalEl.textContent = String(N);
 
@@ -51,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // whenever the participant clicks Next -- even mid-drag or right away.
   function syncHiddenFields() {
     fieldScore.value = String(score);
+    fieldMoved.value = String(movedCount);
     fieldTime.value = ((Date.now() - startTime) / 1000).toFixed(1);
     fieldPacing.value = JSON.stringify(pacingTimestamps);
   }
@@ -59,8 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
   for (let i = 0; i < N; i++) {
     const row = document.createElement('div');
     row.className = 'slider-row';
+    const columnIndex = i % COLS;
+    const rowIndex = Math.floor(i / COLS);
+    row.style.gridColumn = String(columnIndex + 1);
+    row.style.gridRow = String(
+        rowIndex + 1 + (COLUMN_ROW_SHIFTS[columnIndex] || 0));
     row.style.marginLeft =
-        OFFSETS[Math.floor(i / COLS) % OFFSETS.length] + 'px';
+        OFFSETS[rowIndex % OFFSETS.length] + 'px';
 
     const slider = document.createElement('input');
     slider.type = 'range';
@@ -76,6 +91,13 @@ document.addEventListener('DOMContentLoaded', () => {
     slider.addEventListener('input', () => {
       const v = parseInt(slider.value, 10);
       label.textContent = String(v);
+
+      // Count each slider once, the first time it leaves its initial value.
+      // Returning it to MIN later does not undo the recorded interaction.
+      if (v !== MIN && !hasMoved[i]) {
+        hasMoved[i] = true;
+        movedCount += 1;
+      }
 
       // ── Live score ──
       const newFlag = (v === TARGET) ? 1 : 0;

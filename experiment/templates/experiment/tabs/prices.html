@@ -1,13 +1,13 @@
 {#
   Market-parameter banner shown on top of the Negotiate tab.
   Adapted from the example repository's templates/prices.html: the retail
-  price (RP) is the Retailer's PRIVATE information, so the Supplier sees
+  price (P) is the Retailer's PRIVATE information, so the Supplier sees
   only the Retailer's disclosure (or the absence of one) instead of the true
   value. The production cost (PC) is common knowledge.
 #}
 <p>
   {% if player.is_retailer %}
-    <strong>Your Retail Price (RP) is €{% group.market_price %}
+    <strong>Your Retail Price (P) is €{% group.market_price %}
       (private information).</strong>
     <strong>The Production Cost (PC) is €{% group.production_cost %}.</strong>
   {% else %}
@@ -21,7 +21,7 @@
     </div>
   {% else %}
     <div class="alert alert-secondary">
-      The Retailer chose not to disclose their Retail Price (RP).
+      The Retailer chose not to disclose their Retail Price (P).
     </div>
   {% endif %}
 {% endif %}

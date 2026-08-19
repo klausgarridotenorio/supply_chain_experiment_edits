@@ -121,12 +121,12 @@ Output a python list: `[Price, Quantity]`
 
 ### CRITICAL RULES (READ CAREFULLY)
 1. **Ignore Contextual Numbers:** You must **IGNORE** numbers referring to:
-   - **RP** or **Retail Price** or **Market Price**.
+   - **P** or **Retail Price** or **Market Price**.
    - **Production Cost** or **Cost** or **PC**.
    - **Previous offers** that are just being referenced.
 2. **Valid Indicators:** - **Price:** Look for "Price", "Offer", "w=" (Wholesale), or "w" (e.g., "w=3").
    - **Quantity:** Look for "Quantity", "Units", "q=" (Quantity), or "q" (e.g., "q=50").
-3. **RP is NOT Quantity:** If a user mentions "RP" or "Retail Price" (e.g., "RP is 4"), this is a price constraint, NOT a quantity. Do not put this number in the Quantity slot.
+3. **P is NOT Quantity:** If a user mentions "P" or "Retail Price" (e.g., "P is 4"), this is a price constraint, NOT a quantity. Do not put this number in the Quantity slot.
 4. **Empty Output:** If the message contains numbers but no specific *new offer*, output `[,]`.
 
 ### EXAMPLES
@@ -168,7 +168,7 @@ def system_final_prompt(market_price: int | float,
     """The retailer bot's negotiation system prompt, per condition.
 
     * Disclosure conditions (true_value / own_value): the split
-      before_constraint + €<RP> + after_constraint prompt. `market_price`
+      before_constraint + €<P> + after_constraint prompt. `market_price`
       must be the bot's ACTING retail price (the DISCLOSED value -- true
       or a lie), never the true draw. In ai_rp5_disclose_lie the acting
       value is 4, so the constraint reads €4 even though the draw is 5.

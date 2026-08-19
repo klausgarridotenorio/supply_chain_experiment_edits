@@ -1,8 +1,8 @@
 {#
   Private Information Disclosure page (Retailer only).
   The Retailer makes their choice by clicking one of three buttons:
-    1. Disclose 4      -> the Supplier is shown an RP of €4
-    2. Disclose 5      -> the Supplier is shown an RP of €5
+    1. Disclose 4      -> the Supplier is shown an P of €4
+    2. Disclose 5      -> the Supplier is shown an P of €5
     3. No Disclosure   -> nothing is shown
   A click fills the hidden disclosure_choice / disclosed_value form fields
   and submits the page immediately; the true/own/none categorization is
@@ -21,7 +21,7 @@
     </div>
     <div class="card-body">
       <p class="mb-0">
-        Your <strong>Retail Price (RP)</strong> for this negotiation is
+        Your <strong>Retail Price (P)</strong> for this negotiation is
         <strong>€{{ group.market_price }}</strong>.
         The Supplier does <strong>not</strong> know this value.
       </p>
@@ -65,7 +65,7 @@
         <small>
           If you click <em>Disclose 4</em> or <em>Disclose 5</em>, the
           Supplier will be shown that value as your Retail Price -- whether
-          or not it is your actual RP. If you click <em>No Disclosure</em>,
+          or not it is your actual P. If you click <em>No Disclosure</em>,
           the Supplier is told that you chose not to disclose.
         </small>
       </p>
@@ -75,7 +75,7 @@
   <script>
     // Each button fills the hidden form fields and submits the page.
     // The true/own categorization sent here is provisional; the server
-    // re-derives it in before_next_page (disclosed value vs. the true RP).
+    // re-derives it in before_next_page (disclosed value vs. the true P).
     document.addEventListener('DOMContentLoaded', () => {
       const form = document.getElementById('form');
       const choiceInput = document.getElementById('id_disclosure_choice');

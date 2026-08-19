@@ -2,7 +2,7 @@
   Disclosure Reveal page (Supplier only, and only if a deal was made).
   Shown immediately after the Negotiation page and before the Effort Task:
   reminds the Supplier of what the Retailer disclosed on the earlier
-  Disclosure page, then reveals the ACTUAL Retail Price (RP) of this
+  Disclosure page, then reveals the ACTUAL Retail Price (P) of this
   negotiation.
 #}
 {% block title %}
@@ -23,7 +23,7 @@
     <div class="card-body">
       <p>
         Before the negotiation, the Retailer could communicate their Retail
-        Price <strong>(RP)</strong> to you: the true value, a value of their
+        Price <strong>(P)</strong> to you: the true value, a value of their
         own choosing, or nothing.
       </p>
       {% if group.disclosure_message %}
@@ -32,7 +32,7 @@
         </div>
       {% else %}
         <div class="alert alert-secondary mb-0">
-          The Retailer chose not to disclose their Retail Price (RP).
+          The Retailer chose not to disclose their Retail Price (P).
         </div>
       {% endif %}
     </div>
@@ -44,7 +44,7 @@
     </div>
     <div class="card-body">
       <p class="mb-0">
-        The <strong>actual</strong> Retail Price (RP) in this negotiation is
+        The <strong>actual</strong> Retail Price (P) in this negotiation is
         <strong>€{{ group.market_price }}</strong>.
       </p>
     </div>

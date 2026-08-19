@@ -2,7 +2,8 @@
 Project settings.
 
 Session configs:
-  * two_human_negotiation -- the Two-Human game.
+  * two_human_negotiation / two_human_negotiation_rp4 -- the Two-Human
+    game with a fixed retail price for each treatment.
   * ai_* -- the five Single-Player settings (human Supplier vs the AI
     retailer). The retail price draw is fixed per setting via
     market_price_low == market_price_high, and bot_disclosure scripts what
@@ -52,14 +53,29 @@ def demo_setting(name: str, display_name: str, retail_price: int,
     )
 
 
-SESSION_CONFIGS = [
-    dict(
-        name='two_human_negotiation',
-        display_name="Supplier-Retailer Negotiation (Two Human Players)",
+def two_human_setting(name: str, display_name: str,
+                      retail_price: int) -> dict:
+    """Two-Human treatment with a deterministic retail price."""
+    return dict(
+        name=name,
+        display_name=display_name,
         app_sequence=['experiment'],
         num_demo_participants=2,
         ai_retailer=False,
-    ),
+        market_price_low=retail_price,
+        market_price_high=retail_price,
+    )
+
+
+SESSION_CONFIGS = [
+    two_human_setting(
+        'two_human_negotiation',
+        "Supplier-Retailer Negotiation (Two Human Players) -- RP=5",
+        retail_price=5),
+    two_human_setting(
+        'two_human_negotiation_rp4',
+        "Supplier-Retailer Negotiation (Two Human Players) -- RP=4",
+        retail_price=4),
 
     # ── The five AI-retailer settings ────────────────────────────────────
     ai_setting('ai_rp5_disclose_true',

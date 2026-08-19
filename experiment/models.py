@@ -393,7 +393,7 @@ class Player(BasePlayer):
     time_end = models.StringField(max_length=20)
 
     # ── Effort stage (Supplier only; slider task) ────────────────────────
-    # All three fields are written by the EffortTask page's JavaScript
+    # All four fields are written by the EffortTask page's JavaScript
     # through hidden form inputs (see EffortTask.html + effort_task.js), so
     # they are saved via the regular oTree form submission when the Supplier
     # clicks Next -- including when they leave early with an unfinished grid.
@@ -401,6 +401,11 @@ class Player(BasePlayer):
         initial=0, min=0, max=C.NUM_SLIDERS,
         doc="Final score: sliders exactly at the target when Next was "
             "clicked",
+    )
+    effort_put_number_of_sliders_moved = models.IntegerField(
+        initial=0, min=0, max=C.NUM_SLIDERS,
+        doc="Number of distinct sliders moved away from their initial "
+            "position at least once before Next was clicked",
     )
     effort_put_time_on_sliders = models.FloatField(
         initial=0,

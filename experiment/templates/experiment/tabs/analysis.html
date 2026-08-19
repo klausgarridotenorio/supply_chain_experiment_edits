@@ -1,13 +1,13 @@
 {# Decision Support Tool tab. The chart logic lives in
    static/experiment/js/analysis.js and uses the profit formulas
      Supplier: w * min(q, D) - PC * q
-     Retailer: (RP - w) * min(q, D)
+     Retailer: (P - w) * min(q, D)
    evaluated over the whole demand range. No optimal offer is shown
-   (absolute or conditional); the interactive graph uses the RP chosen in
+   (absolute or conditional); the interactive graph uses the P chosen in
    the dropdown below. #}
 <h3>Decision Support System</h3>
 <p>
-  Choose a hypothetical Retail Price (RP), then enter a Wholesale Price and
+  Choose a hypothetical Retail Price (P), then enter a Wholesale Price and
   Quantity combination to see how profits vary with demand for both
   parties. The graph and the profit split update as you change the inputs.
 </p>
@@ -15,7 +15,7 @@
 <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; align-items: end;">
   <div>
     <label for="analysisRP" style="display: block; margin-bottom: 5px;">
-      Retail Price (RP):
+      Retail Price (P):
     </label>
     <select id="analysisRP" style="width: 120px; padding: 5px;">
       <option value="4" selected>4</option>

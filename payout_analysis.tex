@@ -17,8 +17,8 @@ realized profit (if positive), computed after the demand draw:
 \pi_S &= w \cdot \min(q, D) - PC \cdot q, &
 \pi_R &= (RP_{\mathit{eff}} - w) \cdot \min(q, D),
 \end{align*}
-with $PC=1$, $RP \in \{4,5\}$, $w \in [1,5]$, $q \le 100$, and
-$RP_{\mathit{eff}} = RP + 0.02$ per passed slider (capped at $+1$).
+with $PC=1$, $P \in \{4,5\}$, $w \in [1,5]$, $q \le 100$, and
+$RP_{\mathit{eff}} = P + 0.02$ per passed slider (capped at $+1$).
 Demand $D$ is the \emph{average of ten} draws from $U[0,100]$, so
 $D \approx 50 \pm 9$; extreme demand is effectively impossible.
 
@@ -43,7 +43,7 @@ largest observed payment was \euro{18.09} (95th percentile: \euro{12.16}).
 
 \section*{Expected payouts (90\% agreement rate)}
 Monte Carlo with deals at or dispersed around the Nash terms
-(RP\,$=4$: $2.80$\euro{}/75; RP\,$=5$: $3.33$\euro{}/80), 10\% of
+(P\,$=4$: $2.80$\euro{}/75; P\,$=5$: $3.33$\euro{}/80), 10\% of
 participants at baseline only:
 
 \begin{table}[h]\centering

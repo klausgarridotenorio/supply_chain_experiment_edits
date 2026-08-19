@@ -16,6 +16,10 @@
     }
     @media (max-width: 900px) {
       #slider-grid { grid-template-columns: repeat(2, 1fr); }
+      .slider-row {
+        grid-column: auto !important;
+        grid-row: auto !important;
+      }
     }
     @media (max-width: 600px) {
       #slider-grid { grid-template-columns: 1fr; }
@@ -96,6 +100,8 @@
   #}
   <input type="hidden" name="effort_put_number_of_sliders"
          id="id_effort_put_number_of_sliders" value="0">
+  <input type="hidden" name="effort_put_number_of_sliders_moved"
+         id="id_effort_put_number_of_sliders_moved" value="0">
   <input type="hidden" name="effort_put_time_on_sliders"
          id="id_effort_put_time_on_sliders" value="0">
   <input type="hidden" name="effort_put_relative_time_on_sliders"

@@ -6,7 +6,7 @@ const btnDisplayProfits = document.getElementById('btn-display-profits');
 let profitLineChart = null;
 
 // The hypothetical Retail Price chosen in the dropdown (4 or 5, default 4).
-// The DSS never uses the true RP draw -- only this user-chosen value.
+// The DSS never uses the true P draw -- only this user-chosen value.
 function selectedRetailPrice() {
   return parseInt(analysisRP && analysisRP.value) || 4;
 }
@@ -40,7 +40,7 @@ function initializeDecisionSupport() {
 function onAnalysisInputChanged() {
   updateDisplayProfitsButton();
   // Dynamic recalculation: as soon as the inputs are valid, redraw the
-  // graph and the profit split for the currently selected RP.
+  // graph and the profit split for the currently selected P.
   if (!btnDisplayProfits.disabled) {
     plotProfitsVsDemand();
   }
@@ -49,7 +49,7 @@ function onAnalysisInputChanged() {
 // "TEST offer" button in the interface table: copy the counterpart's
 // standing proposal into the DSS inputs and plot it immediately, so the
 // impact of the deal on the table can be inspected before CONFIRM. The
-// hypothetical RP stays whatever is selected in the dropdown.
+// hypothetical P stays whatever is selected in the dropdown.
 function testOffer() {
   const proposal = document.getElementById('otherProposal');
   if (!proposal) {
@@ -100,7 +100,7 @@ function expectedDemandFromQuantity(quantity) {
 function buildProfitSeries(graph_price, graph_quantity) {
   const p = parseFloat(graph_price);
   const q = parseInt(graph_quantity);
-  // The RP comes from the dropdown (hypothetical 4 or 5), NOT from the
+  // The P comes from the dropdown (hypothetical 4 or 5), NOT from the
   // true draw -- the DSS shows conditional what-if analysis only.
   const marketPrice = selectedRetailPrice();
   const productionCost = js_vars.production_cost || 4;
@@ -240,7 +240,7 @@ function plotProfitsVsDemand() {
       plugins: {
         title: {
           display: true,
-          text: `Profit vs Demand (RP: €${selectedRetailPrice().toFixed(2)}, Price: €${priceValue.toFixed(2)}, Quantity: ${quantityValue})`
+          text: `Profit vs Demand (P: €${selectedRetailPrice().toFixed(2)}, Price: €${priceValue.toFixed(2)}, Quantity: ${quantityValue})`
         },
         legend: {
           display: true,
@@ -300,7 +300,7 @@ function updateProfitDetails(graph_price, graph_quantity, expectedDemand, expect
 
   let html = `
     <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
-      <h5>Analysis for RP: €${selectedRetailPrice().toFixed(2)}, Price: €${graph_price.toFixed(2)}, Quantity: ${graph_quantity}</h5>
+      <h5>Analysis for P: €${selectedRetailPrice().toFixed(2)}, Price: €${graph_price.toFixed(2)}, Quantity: ${graph_quantity}</h5>
       <p><strong>Expected Units Sold:</strong> ${expectedDemand.toFixed(2)} units</p>
     </div>
     

@@ -40,7 +40,7 @@ def JsonField(**kwargs) -> OTreeColumn:
 def retailer_profit(market_price: float, price: float,
                     quantity_sold: int) -> float:
     """Retailer earns the retail margin on every unit actually sold:
-    (RP - w) * min(q, D)."""
+    (P - w) * min(q, D)."""
     return (market_price - price) * quantity_sold
 
 

@@ -617,13 +617,14 @@ class EffortTask(Page):
     achieved by then is recorded.
 
     Data flow: the page's JavaScript (static/experiment/js/effort_task.js)
-    keeps three hidden form inputs in sync (score, seconds on page, pacing
-    timestamps), so the effort_put_* fields are saved through the normal
-    oTree form submission when Next is clicked.
+    keeps four hidden form inputs in sync (score, distinct sliders moved,
+    seconds on page, and pacing timestamps), so the effort_put_* fields are
+    saved through the normal oTree form submission when Next is clicked.
     """
     form_model = 'player'
     form_fields = [
         'effort_put_number_of_sliders',
+        'effort_put_number_of_sliders_moved',
         'effort_put_time_on_sliders',
         'effort_put_relative_time_on_sliders',
     ]
