@@ -19,8 +19,11 @@ def _debug_path(file_name: str) -> str:
 
 def log_debug(*messages: object):
     message = ' '.join(str(m) for m in messages)
+    # Keep every diagnostic visible in the oTree/devserver terminal as well
+    # as in debug.log. flush=True matters for long-running async LLM calls.
+    print(f"[debug] {message}", flush=True)
     with open(_debug_path('debug.log'), 'a') as f:
-        f.write(f"[{now_datetime()}] {message}\n")
+        f.write(f"[{now_datetime()}] [debug] {message}\n")
 
 
 def log_interpret(message: str, llm_output: str,

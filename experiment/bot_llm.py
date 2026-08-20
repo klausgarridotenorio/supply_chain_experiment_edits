@@ -11,12 +11,6 @@ Adaptations for this project:
     session config form a failover list, with the LOCAL Ollama
     (http://localhost:11434) always appended as the last resort -- so a
     plain local `ollama serve` with llama3 works with no remote hosts.
-  * OPENROUTER: config use_open_router=True routes every LLM call to
-    OpenRouter's OpenAI-compatible API (config open_router_model) instead
-    of the Ollama stack; otherwise OpenRouter is still tried as the FINAL
-    fallback after every Ollama host has failed. Needs an API key in the
-    OPENROUTER_API_KEY environment variable (see settings.py); without a
-    key the pre-OpenRouter behavior is unchanged.
   * READER: interpreting offers first tries spacy (if installed), then the
     dedicated reader model (config llm_reader, see
     Ollama_LLMs/Modelfile_reader_of_offers_v3); if that model does not
@@ -27,6 +21,7 @@ The mixin expects the concrete class (NegotiationBot) to provide:
 config (with llm_* keys, market_price, production_cost, participant_code),
 constraint_user / constraint_bot (BotStrategy).
 """
+import json
 import re
 from typing import Any
 
@@ -40,10 +35,7 @@ from .prompts import PROMPTS, READER_SYSTEM_PROMPT, system_final_prompt
 from .utils import log_debug, log_interpret
 
 LOCAL_OLLAMA = 'http://localhost:11434'
-OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
 PATTERN_OFFER = re.compile(r'\[([^]]+)]')
-# Reasoning models (e.g. nemotron) may wrap deliberation in <think> tags.
-PATTERN_THINK = re.compile(r'<think>.*?</think>', re.DOTALL)
 
 # Optional spacy fast path for offer interpretation (repo behavior). The
 # LLM reader below covers everything when spacy or its model is missing.
@@ -61,25 +53,43 @@ class BotLLM:
     # Lazy state (class-level defaults; instances overwrite on first use).
     client = None
     _llm_host = None
-    # Sticky flag: once OpenRouter answered (selected or as the fallback
-    # after all Ollama hosts failed), it serves the whole negotiation.
-    _openrouter_active = False
+
+    @staticmethod
+    def _log_llm_input(backend: str, model: str,
+                       messages: list[dict[str, str]],
+                       options: dict[str, Any] = None):
+        """Print the exact messages sent to a model, without credentials."""
+        log_debug(
+            f"[LLM INPUT] backend={backend} model={model} options={options}",
+            "\n" + json.dumps(messages, indent=2, ensure_ascii=False))
+
+    @staticmethod
+    def _log_llm_raw_output(backend: str, model: str,
+                            response: ChatResponse | dict[str, Any]):
+        """Print model text before extract_content/scrub_text trimming."""
+        try:
+            content = response['message']['content']
+        except (KeyError, TypeError):
+            content = response
+        log_debug(
+            f"[LLM RAW OUTPUT before trimming] backend={backend} model={model}",
+            "\n" + str(content))
 
     ############################################################################
     # Client / host handling
     ############################################################################
     def _host_candidates(self) -> list[str]:
-        """Enabled http(s):// entries of the session config, in order, with
-        the local Ollama appended as the last resort."""
+        """Load-balance enabled remote Ollama hosts, then try local last."""
         hosts = [key for key, enabled in self.config['session_config'].items()
                  if isinstance(key, str)
                  and key.startswith(('http://', 'https://'))
+                 and key != LOCAL_OLLAMA
                  and enabled is True]
-        if LOCAL_OLLAMA not in hosts:
-            hosts.append(LOCAL_OLLAMA)
         # Stable per-participant rotation spreads groups across hosts.
-        shift = sum(map(ord, self.config['participant_code'])) % len(hosts)
-        return hosts[shift:] + hosts[:shift]
+        if hosts:
+            shift = sum(map(ord, self.config['participant_code'])) % len(hosts)
+            hosts = hosts[shift:] + hosts[:shift]
+        return hosts + [LOCAL_OLLAMA]
 
     def _make_client(self, host: str) -> AsyncClient:
         auth = None
@@ -97,22 +107,22 @@ class BotLLM:
         """One chat call with failover across the host candidates. The
         winning host is kept for the rest of the negotiation.
 
-        OpenRouter routing: with config use_open_router=True (or once the
-        fallback below has engaged) every call goes to OpenRouter and the
-        Ollama hosts are never tried. Otherwise, when EVERY Ollama host
-        (SURF VMs + local) has failed and an OpenRouter API key is
-        configured, the call is answered by OpenRouter as the last resort
-        instead of raising."""
-        if self._openrouter_active or self.config.get('use_open_router'):
-            return await self._openrouter_chat(model, messages, options)
+        Calls fail over across the configured SURF Ollama servers and the
+        local Ollama instance. If every host is unavailable, the final
+        connection error is raised to the solver fallback."""
 
         if self.client is not None:
-            return await self.client.chat(model=model, options=options,
-                                          messages=messages)
+            backend = self._llm_host or 'ollama-sticky-host'
+            self._log_llm_input(backend, model, messages, options)
+            response = await self.client.chat(model=model, options=options,
+                                              messages=messages)
+            self._log_llm_raw_output(backend, model, response)
+            return response
 
         last_exc = None
         for host in self._host_candidates():
             client = self._make_client(host)
+            self._log_llm_input(host, model, messages, options)
             try:
                 response = await client.chat(model=model, options=options,
                                              messages=messages)
@@ -123,57 +133,10 @@ class BotLLM:
             self.client = client
             self._llm_host = host
             log_debug(f"[BotLLM] using host {host}")
+            self._log_llm_raw_output(host, model, response)
             return response
 
-        if self.config.get('open_router_api_key'):
-            log_debug('[BotLLM] all Ollama hosts down; '
-                      'falling back to OpenRouter')
-            response = await self._openrouter_chat(model, messages, options)
-            self._openrouter_active = True
-            return response
         raise last_exc
-
-    async def _openrouter_chat(self, model: str,
-                               messages: list[dict[str, str]],
-                               options: dict[str, Any] = None) \
-            -> dict[str, Any]:
-        """One chat call to OpenRouter (OpenAI-compatible API). Whatever
-        Ollama model was requested maps onto the single configured
-        open_router_model; a request for the dedicated offer-reader model
-        (which only exists on the Ollama hosts) additionally gets the
-        reader SYSTEM prompt, exactly like the missing-reader fallback in
-        _interpret_offer_llm. Returns an Ollama-shaped
-        {'message': {'content': ...}} dict."""
-        api_key = self.config.get('open_router_api_key')
-        if not api_key:
-            raise RuntimeError(
-                'use_open_router is set but no API key is configured -- '
-                'set the OPENROUTER_API_KEY environment variable')
-
-        if model == self.config['llm_reader'] \
-                and not any(m['role'] == 'system' for m in messages):
-            messages = [{'role': 'system',
-                         'content': READER_SYSTEM_PROMPT}] + messages
-            options = {'temperature': 0}
-
-        payload = {
-            'model': self.config.get('open_router_model',
-                                     'nvidia/nemotron-nano-9b-v2:free'),
-            'messages': messages,
-        }
-        if options and options.get('temperature') is not None:
-            payload['temperature'] = options['temperature']
-
-        async with httpx.AsyncClient(
-                timeout=httpx.Timeout(120, connect=10)) as client:
-            response = await client.post(
-                OPENROUTER_URL,
-                headers={'Authorization': f"Bearer {api_key}"},
-                json=payload)
-        response.raise_for_status()
-        content = response.json()['choices'][0]['message']['content'] or ''
-        content = PATTERN_THINK.sub('', content).strip()
-        return {'message': {'content': content}}
 
     ############################################################################
     # Message generation
@@ -211,7 +174,8 @@ class BotLLM:
             return re.sub(r'^[^a-zA-Z0-9]+', '', s)
 
         try:
-            content: str = response['message']['content'].strip()
+            raw_content: str = response['message']['content']
+            content = raw_content.strip()
         except KeyError:
             log_debug(f"Unexpected response format: {response}")
             return f"\nUnexpected response format: {response}\n"
@@ -263,6 +227,7 @@ class BotLLM:
         content = content.split('\n', 1)[0]
         content = content.strip().strip('"')
 
+        log_debug('[LLM OUTPUT after extract_content]', '\n' + content)
         return content
 
     ############################################################################

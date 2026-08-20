@@ -49,9 +49,9 @@ def nash_bargaining_solution(constraint_a: int, constraint_b: int) \
 
     quantity_star = int(max(q_candidates, key=sort_function))
 
-    profit_supplier = Offer.profit_supplier(
-        price_star, quantity_star, production_cost)
-    target_profit = math.floor(profit_supplier * 100) / 100
+    profit_retailer = Offer.profit_retailer(
+        price_star, quantity_star, market_price)
+    target_profit = math.floor(profit_retailer * 100) / 100
 
     return {'profit': target_profit, 'offer': (price_star, quantity_star)}
 

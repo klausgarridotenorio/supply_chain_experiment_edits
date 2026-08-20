@@ -23,11 +23,12 @@ import asyncio
 from typing import Any, AsyncIterator
 
 from .bot_guard import (ACCEPT_POINTER, ACCEPT_POINTER_NO_OFFER,
-                        REFUSAL_LINE, classify_message, widget_like)
+                        classify_message, refusal_line, widget_like)
 from .bot_strategy import BotStrategy, FALLBACK_OFFER_STRING
 from .constants import C
 from .offer import Offer, OfferList
 from .prompts import PROMPTS
+from .utils import log_debug
 
 
 class NegotiationBot(BotStrategy):
@@ -65,13 +66,6 @@ class NegotiationBot(BotStrategy):
             'llm_temp': session_config.get('llm_temp', 0.1),
             'llm_reader': session_config.get('llm_reader',
                                              'offer_reader_v2'),
-            # OpenRouter: primary backend when use_open_router is True,
-            # last-resort fallback otherwise (see bot_llm.BotLLM._chat).
-            'use_open_router': session_config.get('use_open_router', False),
-            'open_router_model': session_config.get(
-                'open_router_model', 'nvidia/nemotron-nano-9b-v2:free'),
-            'open_router_api_key': session_config.get(
-                'open_router_api_key', ''),
             # Host flags ("https://...": True) are read from here.
             'session_config': session_config,
             'participant_code': player.participant.code,
@@ -127,6 +121,7 @@ class NegotiationBot(BotStrategy):
         backfilled. Incomplete/absent terms flow into the NOT_OFFER
         guidance reply."""
         self.user_message = body
+        log_debug('[CHATBOT INPUT human chat]', '\n' + body)
 
         verdict = await classify_message(self, body,
                                          self._recent_context(body))
@@ -137,7 +132,15 @@ class NegotiationBot(BotStrategy):
                     verdict['type'] == 'offer'
                     and not widget_like(verdict['item'])):
                 await asyncio.sleep(C.BOT_RESPONSE_DELAY)
-                yield self._say(REFUSAL_LINE)
+                optimal_offer = self.player.group.optimal_offer
+                price, quantity = optimal_offer['offer']
+                bot_offer = Offer(idx=C.BOT_ID, price=float(price),
+                                  quantity=int(quantity))
+                self.add_profits(bot_offer)
+                self.offer_list.append(bot_offer)
+                self._store_offers()
+                payload = self._say(refusal_line(optimal_offer))
+                yield {**payload, 'offers': list(self.offer_list)}
                 return
 
             # Verbal acceptance is never binding: scripted pointer to the
@@ -181,6 +184,8 @@ class NegotiationBot(BotStrategy):
         # Rendered as text so the LLM prompts have a counterpart message.
         self.user_message = ("I am making a binding offer of " +
                              FALLBACK_OFFER_STRING % (price, quantity) + ".")
+        log_debug('[CHATBOT INPUT binding interface offer]',
+                  '\n' + self.user_message)
         self.offer_list = self._load_offers()
         offer = self.offer_list[-1]
         async for payload in self.evaluate_and_respond(offer):

@@ -34,12 +34,6 @@ def ai_setting(name: str, display_name: str, retail_price: int,
         market_price_low=retail_price,
         market_price_high=retail_price,
         bot_disclosure=bot_disclosure,
-        # Listed per-config (not only in the defaults) so both appear as
-        # editable fields on the admin's "create session" form: tick
-        # use_open_router there to run this session on the OpenRouter
-        # model below instead of the Ollama/llama3 stack.
-        use_open_router=False,
-        open_router_model='nvidia/nemotron-nano-9b-v2:free',
     )
 
 
@@ -151,18 +145,6 @@ SESSION_CONFIG_DEFAULTS = dict(
         "https://ollama6.src-automating.src.surf-hosted.nl": True,
         "https://ollama7.src-automating.src.surf-hosted.nl": True,
     },
-
-    # ── OpenRouter (cloud alternative to the Ollama stack) ───────────────
-    # use_open_router=True routes ALL of the bot's LLM calls straight to
-    # OpenRouter (open_router_model below). With False, OpenRouter still
-    # acts as the LAST-RESORT fallback: it is tried automatically once
-    # every Ollama host (the SURF VMs and the local Ollama) has failed.
-    # Both paths need an API key in the OPENROUTER_API_KEY environment
-    # variable (a free key from https://openrouter.ai works for the
-    # ':free' model below); without a key, behavior is exactly as before.
-    use_open_router=False,
-    open_router_model='nvidia/nemotron-nano-9b-v2:free',
-    open_router_api_key=environ.get('OPENROUTER_API_KEY', ''),
 
     # ── Timing ───────────────────────────────────────────────────────────
     timeout_negotiation=10 * 60,  # seconds on the Negotiation page

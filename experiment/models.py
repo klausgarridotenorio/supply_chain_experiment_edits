@@ -179,7 +179,7 @@ class Group(BaseGroup):
         raises on template access to attributes that resolve to None."""
         choice, value = self._realized_disclosure()
         if choice in (C.DISCLOSE_TRUE, C.DISCLOSE_OWN) and value is not None:
-            return (f"The Retailer disclosed a Retail Price (RP) "
+            return (f"The Retailer disclosed a Retail Price (P) "
                     f"of €{value:g}.")
         return ''
 
@@ -332,7 +332,7 @@ class Player(BasePlayer):
              "while the Production Cost is the Supplier's private "
              'information.'],
             ['rp_4_or_5_disclosure_free',
-             'The Retail Price (RP) is either €4 or €5 and the Supplier '
+             'The Retail Price (P) is either €4 or €5 and the Supplier '
              'does not know the drawn value; the Retailer can choose to '
              'disclose 4, disclose 5, or disclose nothing. The Production '
              'Cost (PC) is known to everyone.'],

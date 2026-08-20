@@ -1,2 +1,2 @@
 """.
-Lastly, take a look at the last five messages the counterpart sent to you (starting from the most recent to the oldest): """
+Lastly, ensure your response fits the conversation context, and never repeat any sentence from the counterpart's last three messages (starting from the most recent to the oldest): """
