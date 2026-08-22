@@ -301,18 +301,18 @@ function updateProfitDetails(graph_price, graph_quantity, expectedDemand, expect
   let html = `
     <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
       <h5>Analysis for P: €${selectedRetailPrice().toFixed(2)}, Price: €${graph_price.toFixed(2)}, Quantity: ${graph_quantity}</h5>
-      <p><strong>Expected Units Sold:</strong> ${expectedDemand.toFixed(2)} units</p>
+      <p><strong>Average Units Sold:</strong> ${expectedDemand.toFixed(2)} units</p>
     </div>
     
     <div style="display: flex; gap: 20px; margin-bottom: 15px;">
       <div style="background-color: rgba(255, 99, 132, 0.1); padding: 10px; border-radius: 5px; flex: 1;">
-        <h6 style="color: rgba(255, 99, 132, 1); margin-bottom: 5px;">Expected Supplier Profit</h6>
+        <h6 style="color: rgba(255, 99, 132, 1); margin-bottom: 5px;">Average Supplier Profit</h6>
         <p style="font-size: 18px; font-weight: bold; margin: 0; color: ${expectedSupplierProfit < 0 ? '#dc3545' : 'inherit'};">
           €${expectedSupplierProfit.toFixed(2)}
         </p>
       </div>
       <div style="background-color: rgba(54, 162, 235, 0.1); padding: 10px; border-radius: 5px; flex: 1;">
-        <h6 style="color: rgba(54, 162, 235, 1); margin-bottom: 5px;">Expected Retailer Profit</h6>
+        <h6 style="color: rgba(54, 162, 235, 1); margin-bottom: 5px;">Average Retailer Profit</h6>
         <p style="font-size: 18px; font-weight: bold; margin: 0; color: ${expectedRetailerProfit < 0 ? '#dc3545' : 'inherit'};">
           €${expectedRetailerProfit.toFixed(2)}
         </p>
@@ -320,10 +320,10 @@ function updateProfitDetails(graph_price, graph_quantity, expectedDemand, expect
     </div>
     
     <div style="background-color: #e9ecef; padding: 10px; border-radius: 5px;">
-      <p><strong>Total Expected Profit:</strong> €${totalExpectedProfit.toFixed(2)}</p>
+      <p><strong>Total Average Profit:</strong> €${totalExpectedProfit.toFixed(2)}</p>
       ${totalExpectedProfit > 0 ?
-      `<p><strong>Expected Profit Split:</strong> Supplier ${supplierShare.toFixed(1)}% / Retailer ${(100 - supplierShare).toFixed(1)}%</p>` :
-      '<p style="color: orange;"><strong>Warning:</strong> No positive total expected profit.</p>'
+      `<p><strong>Average Profit Split:</strong> Supplier ${supplierShare.toFixed(1)}% / Retailer ${(100 - supplierShare).toFixed(1)}%</p>` :
+      '<p style="color: orange;"><strong>Warning:</strong> No positive total average profit.</p>'
   }
     </div>
   `;
@@ -331,7 +331,7 @@ function updateProfitDetails(graph_price, graph_quantity, expectedDemand, expect
   if (expectedSupplierProfit < 0 || expectedRetailerProfit < 0) {
     html += `
       <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-top: 10px;">
-        <strong> Warning:</strong> Negative expected profits detected. This deal may result in losses.
+        <strong> Warning:</strong> Negative average profits detected. This deal may result in losses.
       </div>
     `;
   }

@@ -52,7 +52,7 @@
       <ul class="list-unstyled">
         <li class="mb-2"><strong>Wholesale Price (w):</strong> <span class="badge bg-light text-dark border">{{ price }}</span></li>
         <li class="mb-2"><strong>Quantity (q):</strong> <span class="badge bg-light text-dark border">{{ quantity }}</span></li>
-        <li class="mb-2"><strong>Average Demand (across 10 draws):</strong> <span class="badge bg-light text-dark border">{{ demand }}</span></li>
+        <li class="mb-2"><strong>Single draw of Demand:</strong> <span class="badge bg-light text-dark border">{{ demand }}</span></li>
       </ul>
     </div>
   </div>
@@ -64,9 +64,9 @@
     </div>
     <div class="card-body">
       <p class="lead">
-        Given the agreement above and an average demand across the 10
-        draws of <strong>{{ demand }}</strong>,
-        what is your total profit from this deal?
+        Given the agreement above and a single demand draw
+        of <strong>{{ demand }}</strong>,
+        what is your profit?
       </p>
 
       <div class="alert alert-info" role="alert">
