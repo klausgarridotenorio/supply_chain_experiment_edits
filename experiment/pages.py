@@ -18,9 +18,10 @@ Retailer seat idle):
                                            (migrated 1:1 from the repo)
   4. EffortTask            SUPPLIER only,  placeholder task + Next button;
                            only if a deal  skipped entirely when no deal
-     ResultsWaitPage       both            the Retailer IDLES here while the
-                                           Supplier works; on arrival of all:
-                                           demand draw + payoff stub
+     SubjectiveValueInventory every human 16-item questionnaire
+     QualitativeQuestions every human     open-ended reflection
+     ResultsWaitPage       both            wait for both participants; on
+                                           arrival: demand draw + payoffs
   5. Results               both            demand + payoff placeholders
 
 Negotiation-only demo (demo_* configs, negotiation_only=True): every page
@@ -657,6 +658,45 @@ class EffortTask(Page):
         }
 
 
+################################################################################
+# 4b. Subjective Value Inventory and qualitative questions
+################################################################################
+
+class SubjectiveValueInventory(Page):
+    """The 16-item SVI, shown to every human before open-ended questions."""
+
+    form_model = 'player'
+    form_fields = [f'svi_{number:02d}' for number in range(1, 17)]
+
+    @staticmethod
+    def is_displayed(player: Player) -> bool:
+        return not negotiation_only(player)
+
+
+class QualitativeQuestions(Page):
+    """Collect open-ended reflections immediately before the results.
+
+    Retailers skip the effort task, so this page follows their negotiation.
+    Suppliers see it after effort when a deal was reached, or directly before
+    results when no deal was reached.
+    """
+
+    form_model = 'player'
+
+    @staticmethod
+    def is_displayed(player: Player) -> bool:
+        return not negotiation_only(player)
+
+    @staticmethod
+    def get_form_fields(player: Player) -> list[str]:
+        fields = []
+        if player.is_supplier and player.group.deal_reached:
+            fields.append('qualitative_effort_reason')
+        fields.append('qualitative_negotiation_difficulty')
+        fields.append('qualitative_bargaining_strategy')
+        return fields
+
+
 class ResultsWaitPage(WaitPage):
     """The Retailer skips EffortTask (is_displayed False) and IDLES here
     while the Supplier is working. When everyone has arrived: draw the
@@ -698,6 +738,27 @@ class Results(Page):
         config = player.session.config
         deal = group.deal_reached
 
+        if deal:
+            draw_profits = []
+            for demand in group.demand_draws:
+                quantity_sold = min(group.deal_quantity, demand)
+                if player.is_supplier:
+                    quantity_unsold = max(0, group.deal_quantity - demand)
+                    profit = supplier_profit(
+                        group.deal_price, group.production_cost,
+                        quantity_sold, quantity_unsold)
+                else:
+                    profit = retailer_profit(
+                        group.effective_market_price, group.deal_price,
+                        quantity_sold)
+                draw_profits.append(profit)
+        else:
+            draw_profits = [0.0 for _ in group.demand_draws]
+
+        formatted_draw_profits = ', '.join(
+            f"-€{abs(profit):.2f}" if profit < 0 else f"€{profit:.2f}"
+            for profit in draw_profits)
+
         baseline = float(config['participation_fee'])
         bonus = float(player.payoff)
         total = float(player.participant.payoff_plus_participation_fee())
@@ -708,10 +769,9 @@ class Results(Page):
             'formatted_deal_quantity':
                 str(group.deal_quantity) if deal else "",
 
-            # Demand Draw: all NUM_DEMAND_DRAWS draws, and their average
-            # (= the demand the payoffs were computed with).
+            # Demand draws and this participant's profit for each draw.
             'demand_draws': ', '.join(str(d) for d in group.demand_draws),
-            'formatted_demand': f"{group.demand:.1f}",
+            'draw_profits': formatted_draw_profits,
 
             # Own realized outcome (see Group.set_payoffs).
             'formatted_profit': f"{player.profit:.2f}",
@@ -771,6 +831,8 @@ page_sequence = [
 
     Disclosure_reveal,
     EffortTask,
+    SubjectiveValueInventory,
+    QualitativeQuestions,
     ResultsWaitPage,
 
     Results,

@@ -31,8 +31,11 @@ Output: [2.40€, 50]
 Message: Here is the negotiator message you need to read: Here is the negotiator message you need to read: I would like to agree on a price of 2.83 and a quantity of 30, deal?
 Output: [2.83€, 30]
 
-Message: Here is the negotiator message you need to read: My production cost is 2€ so I can't go that low.
+Message: Here is the negotiator message you need to read: What is the maximum price you can pay?
 Output: [,]
+
+Message: 50 units at 3 euros per unit
+Output: [3€,50]
 
 Message: Here is the negotiator message you need to read: my pc is 1 can you give a nice offer
 Output: [,]
@@ -40,7 +43,7 @@ Output: [,]
 Message: Here is the negotiator message you need to read: I need 50 units. My budget is tight because my retail price is 4.
 Output: [,50]
 
-Message: Here is the negotiator message you need to read: My retail price is €5. Based on it, a wholesale price of €3.33 and quantity of 80 are the best deal
+Message: Here is the negotiator message you need to read: My retail price is €5. Based on it, a quantity of 80  and a wholesale price of €3.33 are the best deal.
 Output: [3.33€,80]
 
 Message: Here is the negotiator message you need to read: ok let's do w=2 and q=50

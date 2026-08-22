@@ -40,6 +40,12 @@ from .optimal import nash_bargaining_solution, OPTIMAL_OFFER
 from .utils import now_datetime
 
 
+SVI_CHOICES = [
+    ['1', '1'], ['2', '2'], ['3', '3'], ['4', '4'],
+    ['5', '5'], ['6', '6'], ['7', '7'], ['NA', 'NA'],
+]
+
+
 class Subsession(BaseSubsession):
     pass
 
@@ -102,8 +108,9 @@ class Group(BaseGroup):
     production_cost = models.IntegerField()
     # Demand (D): drawn in draw_demand() only after negotiation/effort.
     # NUM_DEMAND_DRAWS independent Uniform[demand_min, demand_max] draws
-    # are stored in demand_draws; their AVERAGE is the realized demand
-    # used in set_payoffs (hence a float).
+    # are stored in demand_draws. demand stores their average for display;
+    # set_payoffs calculates profit separately for every draw and averages
+    # those profits.
     demand = models.FloatField()
     demand_draws = JsonField(initial=[])
 
@@ -235,8 +242,9 @@ class Group(BaseGroup):
 
     def draw_demand(self):
         """Demand Draw phase: NUM_DEMAND_DRAWS independent uniform integer
-        draws; their AVERAGE is the realized demand used for the payoffs.
-        All draws are revealed on the Results page."""
+        draws. Their average is stored for display, while final profit is
+        calculated for each draw separately and then averaged. All draws are
+        revealed on the Results page."""
         config = self.session.config
         draws = [random.randint(config['demand_min'], config['demand_max'])
                  for _ in range(C.NUM_DEMAND_DRAWS)]
@@ -249,9 +257,11 @@ class Group(BaseGroup):
         pay = participation_fee (€5 baseline, handled natively by oTree)
               + profit_share (5%) * max(realized profit, 0)
 
-        Realized profits use the DRAWN demand:
+        For each of the NUM_DEMAND_DRAWS demand draws, profit is calculated as:
           Supplier: w * min(q, D) - PC * q          (RP plays no role)
           Retailer: (effective RP - w) * min(q, D)
+        The final realized profit is the arithmetic mean of those draw-level
+        profits.
 
         The Supplier's slider task acts as quality checks: each slider on
         target raises the RETAIL price by quality_rp_per_slider (capped at
@@ -272,9 +282,6 @@ class Group(BaseGroup):
         self.effective_market_price = float(self.market_price)
 
         if self.deal_reached:
-            quantity_sold = min(self.deal_quantity, self.demand)
-            quantity_unsold = max(0, self.deal_quantity - self.demand)
-
             # Quality checks from the effort task (Supplier's sliders).
             self.quality_rp_increase = min(
                 supplier.effort_put_number_of_sliders
@@ -283,11 +290,22 @@ class Group(BaseGroup):
             self.effective_market_price = (self.market_price
                                            + self.quality_rp_increase)
 
-            supplier_profit_realized = supplier_profit(
-                self.deal_price, self.production_cost,
-                quantity_sold, quantity_unsold)
-            retailer_profit_realized = retailer_profit(
-                self.effective_market_price, self.deal_price, quantity_sold)
+            supplier_draw_profits = []
+            retailer_draw_profits = []
+            for demand in self.demand_draws:
+                quantity_sold = min(self.deal_quantity, demand)
+                quantity_unsold = max(0, self.deal_quantity - demand)
+                supplier_draw_profits.append(supplier_profit(
+                    self.deal_price, self.production_cost,
+                    quantity_sold, quantity_unsold))
+                retailer_draw_profits.append(retailer_profit(
+                    self.effective_market_price, self.deal_price,
+                    quantity_sold))
+
+            supplier_profit_realized = (
+                sum(supplier_draw_profits) / len(supplier_draw_profits))
+            retailer_profit_realized = (
+                sum(retailer_draw_profits) / len(retailer_draw_profits))
 
         # ── Supplier (human in both game versions) ───────────────────────
         supplier.profit = supplier_profit_realized
@@ -417,6 +435,118 @@ class Player(BasePlayer):
         doc="JSON array of ms-since-page-load at which the k-th slider was "
             "durably placed on target (pacing_timestamps logic adapted from "
             "the Qualtrics reference implementation)",
+    )
+
+    # ── Post-negotiation qualitative responses ───────────────────────────
+    qualitative_effort_reason = LongStringField(
+        label='Why did you put that much effort into the task?',
+    )
+    qualitative_negotiation_difficulty = LongStringField(
+        label='Please discuss: How difficult did you find the negotiation?',
+    )
+    qualitative_bargaining_strategy = LongStringField(
+        label='Please discuss any strategy you used during the bargaining.',
+    )
+
+    # ── Subjective Value Inventory (16 items) ────────────────────────────
+    svi_01 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('1. How satisfied are you with your own outcome—that is, the '
+               'extent to which the terms of your agreement (or lack of '
+               'agreement) benefit you? (1 = Not at all satisfied; '
+               '4 = Moderately satisfied; 7 = Perfectly satisfied)'),
+    )
+    svi_02 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('2. How satisfied are you with the balance between your own '
+               'outcome and your counterpart’s outcome? '
+               '(1 = Not at all satisfied; 4 = Moderately satisfied; '
+               '7 = Perfectly satisfied)'),
+    )
+    svi_03 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('3. Did you feel like you forfeited or “lost” in this '
+               'negotiation? (1 = Not at all; 4 = A moderate amount; '
+               '7 = A great deal)'),
+    )
+    svi_04 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('4. Do you think the terms of your agreement are consistent '
+               'with principles of legitimacy or objective criteria (e.g., '
+               'common standards of fairness, precedent, industry practice, '
+               'legality, etc.)? (1 = Not at all; 4 = Moderately; '
+               '7 = A great deal)'),
+    )
+    svi_05 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('5. Did you “lose face” (i.e., damage your sense of pride) in '
+               'the negotiation? (1 = Not at all; 4 = Moderately; '
+               '7 = A great deal)'),
+    )
+    svi_06 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('6. Did this negotiation make you feel more or less competent '
+               'as a negotiator? (1 = It made me feel less competent; '
+               '4 = It did not make me feel more or less competent; '
+               '7 = It made me feel more competent)'),
+    )
+    svi_07 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('7. Did you behave according to your own principles and '
+               'values? (1 = Not at all; 4 = Moderately; 7 = A great deal)'),
+    )
+    svi_08 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('8. Did this negotiation positively or negatively impact your '
+               'self-image or your impression of yourself? '
+               '(1 = It negatively impacted my self-image; '
+               '4 = It did not positively or negatively impact my self-image; '
+               '7 = It positively impacted my self-image)'),
+    )
+    svi_09 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('9. Do you feel your counterpart listened to your concerns? '
+               '(1 = Not at all; 4 = Moderately; 7 = A great deal)'),
+    )
+    svi_10 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('10. Would you characterize the negotiation process as fair? '
+               '(1 = Not at all; 4 = Moderately; 7 = A great deal)'),
+    )
+    svi_11 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('11. How satisfied are you with the ease (or difficulty) of '
+               'reaching an agreement? (1 = Not at all satisfied; '
+               '4 = Moderately satisfied; 7 = Perfectly satisfied)'),
+    )
+    svi_12 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('12. Did your counterpart consider your wishes, opinions, or '
+               'needs? (1 = Not at all; 4 = Moderately; 7 = Very much)'),
+    )
+    svi_13 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('13. What kind of overall impression did your counterpart make '
+               'on you? (1 = Extremely negative; '
+               '4 = Neither negative nor positive; 7 = Extremely positive)'),
+    )
+    svi_14 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('14. Did the negotiation make you trust your counterpart? '
+               '(1 = Not at all; 4 = Moderately; 7 = A great deal)'),
+    )
+    svi_15 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('15. How satisfied are you with your relationship with your '
+               'counterpart as a result of this negotiation? '
+               '(1 = Not at all satisfied; 4 = Moderately satisfied; '
+               '7 = Perfectly satisfied)'),
+    )
+    svi_16 = models.StringField(
+        choices=SVI_CHOICES, widget=widgets.RadioSelectHorizontal,
+        label=('16. Did the negotiation build a good foundation for a future '
+               'relationship with your counterpart? (1 = Not at all; '
+               '4 = Moderately; 7 = A great deal)'),
     )
 
     # ── Results (placeholder until the payoff logic exists) ──────────────

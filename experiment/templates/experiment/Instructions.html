@@ -113,10 +113,11 @@
           <em>Quality Checks</em> below).
         </li>
         <li>
-          Finally, Demand <strong>(D)</strong> will be randomly
-          drawn from {{ demand_interval }} (equal probability) ten times and 
-          the average profits of those ten draws will be the company's 
-          profits.
+          Finally, Demand <strong>(D)</strong> will be randomly drawn from
+          {{ demand_interval }} (equal probability) ten times. Profit will be
+          calculated separately for each draw. The ten resulting profits will
+          then be added together and divided by ten; this average is the
+          company's final profit.
         </li>
         <li>
           The Supplier carries the risk of unsold inventory (any q &gt; Demand

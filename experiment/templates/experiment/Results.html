@@ -42,9 +42,12 @@
         uniformly from [{{ C.DEMAND_MIN }}, {{ C.DEMAND_MAX }}]:</p>
       <p><span class="badge bg-light text-dark border fs-6">
         {{ demand_draws }}</span></p>
-      <p class="mb-0"><strong>Realized Demand (average of the draws,
-        used for the payouts):</strong>
-        <span class="fs-5">{{ formatted_demand }} units</span></p>
+      <p><strong>Your profit for each demand draw, in the same order:</strong></p>
+      <p><span class="badge bg-light text-dark border fs-6">
+        {{ draw_profits }}</span></p>
+      <p class="mb-0">These <strong>{{ C.NUM_DEMAND_DRAWS }}</strong>
+        draw-level profits were averaged to determine your final profit and
+        payout.</p>
     </div>
   </div>
 
