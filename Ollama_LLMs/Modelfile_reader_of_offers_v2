@@ -22,13 +22,13 @@ Output a python list: `[Price, Quantity]`
 
 ### EXAMPLES
 
-Message: Here is the negotiator message you need to read: Thanks for sharing your goals. I'm happy to work towards a price agreement below the retail price. I'd like to explore Quantity options first. How about we aim for a Quantity of 40 and revisit Price later?
+Message: Here is the negotiator message you need to read: Thanks for sharing your goals. I'm happy to work towards a price agreement below the retail price. I'd like to explore Quantity options first. How about a Quantity of 40 and revisit Price later?
 Output: [,40]
 
 Message: Here is the negotiator message you need to read: Interesting, a price below 5.90€ and Quantity of 20 could work for me too. Can you consider a higher price, say around 6.40€, in exchange for a Quantity of 50?
 Output: [6.40€, 50]
 
-Message: Here is the negotiator message you need to read: Here is the negotiator message you need to read: I would like to agree on a price of 5.83 and a quantity of 30, do we have a deal?   
+Message: Here is the negotiator message you need to read: Here is the negotiator message you need to read: I would like to agree on a price of 5.83 and a quantity of 30, deal?   
 Output: [5.83€, 30]
 
 Message: Here is the negotiator message you need to read: My production cost is 5€ so I can't go that low.

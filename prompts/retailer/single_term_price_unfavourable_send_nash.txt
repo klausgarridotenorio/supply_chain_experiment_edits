@@ -1,0 +1,21 @@
+ (end of counterpart message).
+Formulate a (max 20 words one paragraph) response to your negotiating counterpart using the following strategy (Just output your response, it will be directly sent to the counterpart):
+1. Consider only the latest Supplier message above.
+2. Remember the negotiation_rules.
+3. Try send an offer with both outcomes (Price and Quantity) based on the following logic:
+
+<generation_examples>
+- Example_1: (counterpart message: Wholesale price of 4),
+(optimal_offer: [Price of €3.33 and quantity of 80]),
+-- Response A: That wholesale price is too high. I am proposing €3.33 for 80 units.
+-- Response B: Thanks for your suggestion, unfortunately that price is too far up. I offer €3.33 for 80 units.
+
+- Example_2: (counterpart message: Wholesale price of 3),
+(optimal_offer: [Price of €2.80 and quantity of 75]),
+-- Response A: That wholesale price is too high. I am proposing €2.80 for 75 units.
+-- Response B: Thanks for your suggestion, unfortunately that price is too far up. I offer €2.80 for 75 units.
+</generation_examples>
+
+Now is your turn, based on the counterpart message above ending as (end of counterpart message) and the following optimal_offer craft a short response.
+optimal_offer=
+[

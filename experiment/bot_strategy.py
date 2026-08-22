@@ -30,7 +30,6 @@ BotBase + BotStrategy, with the deliberate changes:
    alive with solver-scripted lines instead of hanging the experiment.
 """
 import asyncio
-import random
 from typing import Any, AsyncIterator
 
 from .bot_guard import lint_problems, scrub_text
@@ -38,10 +37,12 @@ from .bot_llm import BotLLM
 from .constants import C
 from .offer import Offer, OfferList, Evaluation
 from .optimal import optimal_counter_offer, optimal_solution_string
-from .prompts import (PROMPTS, empty_offer_prompt, not_profitable_prompt,
+from .prompts import (empty_offer_prompt, not_profitable_prompt,
+                      acceptance_system_prompt, acceptance_user_prompt,
                       offer_invalid_prompt, offer_without_price_prompt,
                       offer_without_quantity_prompt,
-                      offer_with_single_unfavourable_term_prompt)
+                      offer_with_price_unfavourable_term_prompt,
+                      offer_with_quantity_unfavourable_term_prompt)
 from .utils import log_debug
 
 # Solver-scripted fallback lines, used when no LLM host is reachable or all
@@ -96,25 +97,6 @@ class BotStrategy(BotLLM):
         JsonField: reassign, never mutate in place."""
         self.player.offers = list(self.offer_list)
 
-    def _interactions_slice(self, from_human: bool) -> str:
-        """One side of the split conversation history: the last three
-        messages of that speaker, most recent first, one per line -- fed
-        into the prompts' two separate triple-quoted history blocks
-        (conversation_history_bot/_counterpart.txt). Human lines carry
-        '(Me)' in the nick (models.process_chat)."""
-        lines = [message['body'] for message in self.player.chat_data
-                 if ('(Me)' in message.get('nick', '')) == from_human]
-        recent = lines[-3:][::-1]
-        if not recent:
-            return '(none)'
-        return '\n'.join(f'- {line}' for line in recent)
-
-    def _interactions_bot(self) -> str:
-        return self._interactions_slice(from_human=False)
-
-    def _interactions_counterpart(self) -> str:
-        return self._interactions_slice(from_human=True)
-
     # ── Core response logic (repo's BotStrategy.evaluate, LLM-driven) ────
     async def evaluate_and_respond(self, offer: Offer) \
             -> AsyncIterator[dict[str, Any]]:
@@ -160,34 +142,39 @@ class BotStrategy(BotLLM):
 
     # ── LLM response generation (repo's respond_to_offer retry loop) ─────
     def _respond_prompt(self, evaluation: Evaluation | None,
-                        optimal_offer_str: str) -> str:
-        args = (self.user_message, optimal_offer_str,
-                self._interactions_bot(), self._interactions_counterpart())
+                        optimal_offer_str: str,
+                        offer: Offer | None = None) -> str:
+        args = (self.user_message, optimal_offer_str)
         if evaluation == Evaluation.NOT_OFFER:
-            # Condition-split decision tree (retail-price question rule).
-            return empty_offer_prompt(*args,
-                                      self.config.get('bot_disclosure',
-                                                      C.DISCLOSE_TRUE))
-        elif evaluation == Evaluation.NOT_PROFITABLE_ON_BOTH:
-            return offer_with_single_unfavourable_term_prompt(*args)
-        elif evaluation == Evaluation.OFFER_QUANTITY:
+            return empty_offer_prompt(
+                *args,
+                self.config.get('bot_disclosure', C.DISCLOSE_TRUE))
+        if evaluation == Evaluation.NOT_PROFITABLE_ON_BOTH and offer:
+            if offer.price is not None and offer.quantity is None:
+                return offer_with_price_unfavourable_term_prompt(*args)
+            if offer.quantity is not None and offer.price is None:
+                return offer_with_quantity_unfavourable_term_prompt(*args)
+        if evaluation == Evaluation.NOT_PROFITABLE_ON_PRICE:
+            return offer_with_price_unfavourable_term_prompt(*args)
+        if evaluation == Evaluation.NOT_PROFITABLE_ON_QUANTITY:
+            return offer_with_quantity_unfavourable_term_prompt(*args)
+        if evaluation == Evaluation.OFFER_QUANTITY:
             return offer_without_price_prompt(*args)
-        elif evaluation == Evaluation.OFFER_PRICE:
+        if evaluation == Evaluation.OFFER_PRICE:
             return offer_without_quantity_prompt(*args)
-        elif evaluation == Evaluation.INVALID_OFFER:
+        if evaluation == Evaluation.INVALID_OFFER:
             return offer_invalid_prompt(*args)
-        else:
-            return not_profitable_prompt(*args)
+        return not_profitable_prompt(*args)
 
     async def _respond_to_offer(self, evaluation: Evaluation,
                                 offer: Offer) \
             -> tuple[str, Offer | None]:
         """Generate up to 3 candidate replies, read each candidate's offer
-        back with the reader LLM and evaluate it; send the first
-        self-consistent one (or the most profitable candidate)."""
+        back with the reader LLM and evaluate it; send the first acceptable
+        one, or use the solver-scripted fallback after three failures."""
         optimal_offer_str = optimal_solution_string(
             evaluation, offer, self.constraint_user, self.constraint_bot)
-        content1 = self._respond_prompt(evaluation, optimal_offer_str)
+        content1 = self._respond_prompt(evaluation, optimal_offer_str, offer)
         content2 = self._respond_prompt(None, optimal_offer_str)
         llm_offers = []
         last_offer = llm_output = None
@@ -219,10 +206,9 @@ class BotStrategy(BotLLM):
                 if candidate_eval == Evaluation.ACCEPT:
                     return llm_output, last_offer
             else:
-                # Every generated negotiation reply, including replies from
-                # the two Send_Optimal_Offer_or_Instructions prompts, must
-                # contain both a price and a quantity. An incomplete draft
-                # is rejected and generated again, up to three attempts.
+                # Every generated negotiation reply must contain both a price
+                # and a quantity. An incomplete draft is rejected and
+                # generated again, up to three attempts.
                 log_debug(
                     '[BotStrategy._respond_to_offer] incomplete draft; '
                     'retrying:',
@@ -235,21 +221,10 @@ class BotStrategy(BotLLM):
             llm_offers.append(
                 (last_offer['profit_bot'], llm_output, last_offer))
 
-        # No self-profitable candidate after 3 attempts: best of the batch,
-        # excluding drafts the guard lints rejected. If every draft was
-        # linted away or omitted a complete price/quantity pair, raise so
-        # the caller uses the solver-scripted optimal-offer fallback instead
-        # of showing a rule-violating or incomplete message.
-        viable = [candidate for candidate in llm_offers
-                  if candidate[0] > float('-inf')]
-        if not viable:
-            raise RuntimeError(
-                'all LLM drafts failed validation or omitted complete terms')
-        best_profit = max(candidate[0] for candidate in viable)
-        _, llm_output, last_offer = random.choice(
-            [candidate for candidate in viable
-             if candidate[0] == best_profit])
-        return llm_output, (last_offer if last_offer.is_complete else None)
+        # None of the three generated offers reached Evaluation.ACCEPT.
+        # Reject every candidate—including complete but unprofitable ones—and
+        # send the solver-scripted counteroffer containing the optimal terms.
+        return self._fallback_response(evaluation, offer)
 
     def _fallback_response(self, evaluation: Evaluation, offer: Offer) \
             -> tuple[str, Offer | None]:
@@ -275,17 +250,54 @@ class BotStrategy(BotLLM):
     async def _accept_offer(self, offer: Offer) \
             -> AsyncIterator[dict[str, Any]]:
         terms = FALLBACK_OFFER_STRING % (offer.price, offer.quantity)
+        prompt = acceptance_user_prompt(self.user_message)
         if offer.from_chat:
-            prompt = PROMPTS['accept_from_chat'] + self.user_message
             fallback = FALLBACK_ACCEPT_FROM_CHAT % terms
         else:
-            prompt = PROMPTS['accept_from_interface'] + self.user_message
             fallback = FALLBACK_ACCEPT_FROM_INTERFACE % terms
 
         try:
-            response = await self.get_llm_response(prompt)
-            text = scrub_text(self.extract_content(response))
-            if not text:
+            text = None
+            for attempt in range(3):
+                response = await self.get_llm_response(
+                    prompt,
+                    system_prompt_override=acceptance_system_prompt())
+                candidate_text = scrub_text(self.extract_content(response))
+                problems = lint_problems(candidate_text, Evaluation.ACCEPT)
+                if problems:
+                    log_debug(
+                        '[BotStrategy._accept_offer] linted; retrying:',
+                        problems)
+                    continue
+
+                candidate_offer = await self._interpret_offer_llm(
+                    candidate_text, C.BOT_ID)
+                terms_match = (
+                    candidate_offer.is_complete and
+                    candidate_offer.is_valid and
+                    round(candidate_offer.price, 2) == round(offer.price, 2) and
+                    candidate_offer.quantity == offer.quantity)
+                confirm_present = (
+                    not offer.from_chat or
+                    'confirm' in candidate_text.lower())
+                if terms_match and confirm_present:
+                    text = candidate_text
+                    break
+
+                log_debug(
+                    '[BotStrategy._accept_offer] acceptance draft failed; '
+                    'retrying:',
+                    {'attempt': attempt + 1,
+                     'expected_price': offer.price,
+                     'expected_quantity': offer.quantity,
+                     'generated_price': candidate_offer.price,
+                     'generated_quantity': candidate_offer.quantity,
+                     'confirm_present': confirm_present})
+
+            if text is None:
+                log_debug(
+                    '[BotStrategy._accept_offer] all 3 acceptance drafts '
+                    'failed; using scripted fallback')
                 text = fallback
         except Exception as exc:
             log_debug('[BotStrategy] LLM unavailable on accept:', repr(exc))

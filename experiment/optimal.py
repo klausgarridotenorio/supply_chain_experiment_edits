@@ -167,11 +167,12 @@ def optimal_solution_string(evaluation: Evaluation,
                             constraint_bot: int) -> str:
     """The optimal offer as prompt text ("Price of X€ and quantity of Y")
     inserted into the LLM prompts (repo's optimal_solution_string, adapted
-    to this project's solver signatures). Empty for ACCEPT/INVALID, where
-    the prompts carry no optimal_offer slot."""
+    to this project's solver signatures). Empty only for ACCEPT; invalid
+    offers are countered with the Nash offer so the generation prompt always
+    receives a complete, valid price/quantity pair."""
     from .prompts import PROMPTS  # local import to avoid cycles
 
-    if evaluation in (Evaluation.ACCEPT, Evaluation.INVALID_OFFER):
+    if evaluation == Evaluation.ACCEPT:
         return ''
     price, quantity = optimal_counter_offer(
         evaluation, offer, constraint_user, constraint_bot)
@@ -191,8 +192,11 @@ def optimal_counter_offer(evaluation: Evaluation,
     optimal_solution_string."""
     args = (offer, constraint_user, constraint_bot)
 
-    if evaluation in (Evaluation.ACCEPT, Evaluation.INVALID_OFFER):
+    if evaluation == Evaluation.ACCEPT:
         return None, None
+    elif evaluation == Evaluation.INVALID_OFFER:
+        price, quantity = nash_bargaining_solution(
+            constraint_user, constraint_bot)['offer']
     elif evaluation in (Evaluation.OFFER_PRICE,
                         Evaluation.NOT_PROFITABLE_ON_QUANTITY):
         price, quantity = optimal_quantity_for_wholesale_price(*args)

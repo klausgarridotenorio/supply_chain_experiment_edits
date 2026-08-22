@@ -124,14 +124,14 @@ SESSION_CONFIG_DEFAULTS = dict(
 
     # ── LLM chat stack (AI retailer's natural-language layer) ────────────
     # llama3 over Ollama writes the bot's chat; llm_reader is the dedicated
-    # offer-extraction model (create it with:
+    # offer-extraction model used for every incoming chat message (create it with:
     #   ollama create offer_reader_v4 -f Ollama_LLMs/Modelfile_reader_of_offers_v4
-    # -- when it is missing, bot_llm.py falls back to llm_model with the
-    # Modelfile's system prompt). Credentials apply to the remote hosts.
+    # There is no alternate parsing shortcut or plain-llama reader fallback.
+    # Credentials apply to the remote hosts.
     llm_user='otree',
     llm_pass='ped+GlubbomOnEc4',
     llm_model='llama3',
-    llm_temp=0.1,
+    llm_temp=0.5,
     llm_reader='offer_reader_v4',
     # Ollama hosts: every enabled (True) http(s) key joins the failover
     # list; the local Ollama (http://localhost:11434) is always tried as

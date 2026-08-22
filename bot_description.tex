@@ -96,16 +96,9 @@ A chat message naming only one term becomes a partial offer, and the bot
 \paragraph*{5. The pipeline around the math}
 Per chat message:
 \begin{enumerate}
-    \item \textbf{Guard classification} (\texttt{bot\_guard.py}, llama3),
-    \textbf{context-aware}: the classifier sees the last three exchanged
-    messages plus the bot's last line, so short contextual answers (a bare
-    ``25'' after the bot asked for a quantity) are read as partial offers
-    rather than noise, and their terms are backfilled if the offer reader
-    misses them. Off-topic requests and non-widget goods $\rightarrow$
-    fixed refusal line; verbal acceptances (``ok, deal'') $\rightarrow$
-    scripted pointer to the CONFIRM button.
-    \item \textbf{Offer reading}: spacy fast path, then the offer-reader
-    Ollama model extracting [price, quantity] (range outputs like
+    \item \textbf{Offer reading}: every incoming chat message is sent
+    directly to the \texttt{offer\_reader\_v4} Ollama model, which extracts
+    [price, quantity] (range outputs like
     ``60--85'' resolve to the Nash terms when they contain them).
     \item \textbf{Decision} --- accept or reject, and the anchor terms of
     any counter --- by the math above, never by the LLM.

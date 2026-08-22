@@ -22,14 +22,14 @@ Output a python list: `[Price, Quantity]`
 
 ### EXAMPLES
 
-Message: Here is the negotiator message you need to read: Thanks for sharing your goals. I'm happy to work towards a price agreement below the retail price. I'd like to explore Quantity options first. How about we aim for a Quantity of 40 and revisit Price later?
+Message: Here is the negotiator message you need to read: Thanks for sharing your goals. I'm happy to work towards a price agreement below the retail price. I'd like to explore Quantity options first. How about a Quantity of 40 and revisit Price later?
 Output: [,40]
 
 Message: Here is the negotiator message you need to read: Interesting, a price below 3.90€ and Quantity of 20 could work for me too. Can you consider a higher price, say around 2.40€, in exchange for a Quantity of 50?
 Output: [2.40€, 50]
 
-Message: Here is the negotiator message you need to read: Here is the negotiator message you need to read: I would like to agree on a price of 3.83 and a quantity of 30, do we have a deal?
-Output: [3.83€, 30]
+Message: Here is the negotiator message you need to read: Here is the negotiator message you need to read: I would like to agree on a price of 2.83 and a quantity of 30, deal?
+Output: [2.83€, 30]
 
 Message: Here is the negotiator message you need to read: My production cost is 2€ so I can't go that low.
 Output: [,]
@@ -37,11 +37,11 @@ Output: [,]
 Message: Here is the negotiator message you need to read: my pc is 1 can you give a nice offer
 Output: [,]
 
-Message: Here is the negotiator message you need to read: I need 100 units. My budget is tight because my retail price is 11.
-Output: [,100]
+Message: Here is the negotiator message you need to read: I need 50 units. My budget is tight because my retail price is 4.
+Output: [,50]
 
-Message: Here is the negotiator message you need to read: considering my production cost of 1€, i have to offer a price of 3€ with a quantity of 80
-Output: [3.00€,80]
+Message: Here is the negotiator message you need to read: My retail price is €5. Based on it, a wholesale price of €3.33 and quantity of 80 are the best deal
+Output: [3.33€,80]
 
 Message: Here is the negotiator message you need to read: ok let's do w=2 and q=50
 Output: [2.00€,50]

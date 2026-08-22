@@ -89,9 +89,8 @@ its **acting RP** = the value it disclosed (truthful or a lie), or 4 when it
 disclosed nothing. Its profit functions, Nash target, counter-offers, and
 even its LLM system prompt all run on this acting RP.
 
-**Reading the human's offer.** Each chat message is parsed for `(w, q)`:
-first a fast numeric pass (spacy, when available), then the offer-reader LLM
-that returns a strict `[Price, Quantity]`. A message may yield a **complete**
+**Reading the human's offer.** Every chat message is sent directly to
+`offer_reader_v4`, which returns a strict `[Price, Quantity]`. A message may yield a **complete**
 offer (both terms), a **partial** offer (one term), or **no** offer.
 
 **Deciding.** A complete offer is `evaluate()`d: if its expected profit to

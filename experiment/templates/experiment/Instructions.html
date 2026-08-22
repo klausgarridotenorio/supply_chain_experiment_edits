@@ -104,13 +104,19 @@
           Price <strong>(w)</strong> &amp; Quantity <strong>(q)</strong>.
         </li>
         <li>
+          After the negotiation, the real Retail Price (P) will be revealed 
+          to the Supplier. 
+        </li>
+        <li>
           If a deal is reached, the Supplier completes an additional
           quality-check task before the results are shown (see
           <em>Quality Checks</em> below).
         </li>
         <li>
-          After the negotiation, Demand <strong>(D)</strong> will be randomly
-          drawn from {{ demand_interval }} (equal probability).
+          Finally, Demand <strong>(D)</strong> will be randomly
+          drawn from {{ demand_interval }} (equal probability) ten times and 
+          the average profits of those ten draws will be the company's 
+          profits.
         </li>
         <li>
           The Supplier carries the risk of unsold inventory (any q &gt; Demand

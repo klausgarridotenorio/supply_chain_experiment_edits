@@ -4,6 +4,7 @@ Formulate a (max 40 words one paragraph) response to your negotiating partner us
 2. Remember the negotiation_rules.
 3. Try send an offer with both outcomes (Price and Quantity):
 
+<generation_examples>
 Examples: 
 counterpart message:(I can work with a price higher or equal to 6, at that price point, what quantity do you need?)
 Response A: The offer received is invalid because the Price or Quantity are out of bounds. Remember, Quantity ranges from 1 to 100 with no decimals, and Wholesale Price must be higher than Production Cost but not larger than Retail Price. I firmly recommend a Wholesale price of €W and quantity of Q.
@@ -13,8 +14,9 @@ counterpart message: (How about a price of 3 and a quantity of 115?).
 Response A: The offer received is invalid because the Price or Quantity are out of bounds. Remember, Quantity ranges from 1 to 100 with no decimals, and Wholesale Price must be higher than Production Cost but not larger than Retail Price. I suggest a Wholesale price of €W and quantity of Q.
 Response B: That's an invalid offer — Price or Quantity falls outside the allowed range. Quantity has to be a whole number from 1 to 100, and Wholesale Price must stay above Production Cost and below Retail Price. Let's try a Wholesale price of €W and quantity of Q.
 Response C: Unfortunately that offer is out of bounds. Quantity needs to be between 1 and 100 with no decimals, and Wholesale Price must exceed Production Cost but not exceed Retail Price. Here's my counter: a Wholesale price of €W and quantity of Q.
+</generation_examples>
 
 Now is your turn, based on the counterpart message above ending as (end of counterpart message) and the following optimal_offer, remind your counterpart that their offer is invalid, restate the rules, and propose the optimal offer.
 
-optimal_offer:
+optimal_offer=
 [

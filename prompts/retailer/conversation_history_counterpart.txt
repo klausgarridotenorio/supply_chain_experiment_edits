@@ -1,2 +1,2 @@
-""".
-Lastly, ensure your response fits the conversation context, and never repeat any sentence from the counterpart's last three messages (starting from the most recent to the oldest): """
+ (end of counterpart message) """
+Ensure your response follows the examples but never copy word-by-word the last message from Retailer (Me) or the last messge from the Supplier finished in (end of counterpart message).

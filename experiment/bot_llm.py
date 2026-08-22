@@ -11,11 +11,9 @@ Adaptations for this project:
     session config form a failover list, with the LOCAL Ollama
     (http://localhost:11434) always appended as the last resort -- so a
     plain local `ollama serve` with llama3 works with no remote hosts.
-  * READER: interpreting offers first tries spacy (if installed), then the
-    dedicated reader model (config llm_reader, see
-    Ollama_LLMs/Modelfile_reader_of_offers_v3); if that model does not
-    exist on the host, it falls back to the plain llm_model prompted with
-    the Modelfile's SYSTEM text (prompts.READER_SYSTEM_PROMPT).
+  * READER: every natural-language message being interpreted as an offer
+    is sent directly to offer_reader_v4, with no alternate parsing or
+    plain-llama fallback in the offer-reading path.
 
 The mixin expects the concrete class (NegotiationBot) to provide:
 config (with llm_* keys, market_price, production_cost, participant_code),
@@ -26,25 +24,16 @@ import re
 from typing import Any
 
 import httpx
-from ollama import AsyncClient, ChatResponse, ResponseError
+from ollama import AsyncClient, ChatResponse
 
 from .constants import C
 from .optimal import nash_bargaining_solution
 from .offer import Offer
-from .prompts import PROMPTS, READER_SYSTEM_PROMPT, system_final_prompt
+from .prompts import PROMPTS, system_final_prompt
 from .utils import log_debug, log_interpret
 
 LOCAL_OLLAMA = 'http://localhost:11434'
 PATTERN_OFFER = re.compile(r'\[([^]]+)]')
-
-# Optional spacy fast path for offer interpretation (repo behavior). The
-# LLM reader below covers everything when spacy or its model is missing.
-try:
-    import spacy
-    NLP = spacy.load('en_core_web_sm')
-except Exception:  # ImportError or missing model
-    NLP = None
-
 
 class BotLLM:
     """LLM helpers mixed into NegotiationBot (see bot_strategy.py)."""
@@ -141,15 +130,19 @@ class BotLLM:
     ############################################################################
     # Message generation
     ############################################################################
-    async def get_llm_response(self, content: str) -> ChatResponse:
+    async def get_llm_response(self, content: str,
+                               system_prompt_override: str | None = None) \
+            -> ChatResponse:
         assert isinstance(content, str)
         # The system prompt depends on the disclosure condition: with a
         # disclosed value (true or a lie) it carries the bot's ACTING
         # retail price -- never the true draw; with no disclosure it is
         # the dedicated prompt that names no retail price at all.
-        system_prompt = system_final_prompt(
-            self.config['market_price'],
-            self.config.get('bot_disclosure', C.DISCLOSE_NONE))
+        system_prompt = system_prompt_override
+        if system_prompt is None:
+            system_prompt = system_final_prompt(
+                self.config['market_price'],
+                self.config.get('bot_disclosure', C.DISCLOSE_NONE))
         messages = [{'role': 'system', 'content': system_prompt},
                     {'role': 'user', 'content': content}]
         return await self._chat(
@@ -234,51 +227,15 @@ class BotLLM:
     # Offer interpretation (reading offers out of natural language)
     ############################################################################
     async def interpret_offer(self, message: str, idx: int) -> Offer:
-        """spacy fast path first (when available), then the LLM reader."""
-        if NLP is not None:
-            doc = NLP(message)
-            parts = [t.lemma_ for t in doc if t.pos_ in ('NUM', 'NOUN')]
-            numbers = [self.get_float(p) for p in parts
-                       if self.get_float(p) is not None]
-
-            price = quantity = None
-            if len(numbers) == 2:
-                price, quantity = numbers[0], int(numbers[1])
-            elif len(numbers) == 3:
-                price, quantity = numbers[0], int(numbers[2])
-
-            if None not in (price, quantity):
-                log_interpret(message, 'SPACY', price, quantity)
-                return Offer(idx=idx, from_chat=True, price=price,
-                             quantity=quantity)
-
+        """Send the message directly to offer_reader_v4."""
         return await self._interpret_offer_llm(message, idx)
 
     async def _interpret_offer_llm(self, message: str, idx: int) -> Offer:
-        if re.search(r'\d', message):
-            # A message with at least one number -> let the reader LLM
-            # extract [Price, Quantity].
-            content = PROMPTS['understanding_offer'] + message
-            try:
-                response = await self._chat(
-                    model=self.config['llm_reader'],
-                    messages=[{'role': 'user', 'content': content}])
-            except ResponseError:
-                # Reader model not present on this host: same job with the
-                # plain chat model + the Modelfile's SYSTEM prompt.
-                log_debug(f"[BotLLM] reader model "
-                          f"'{self.config['llm_reader']}' missing; "
-                          f"falling back to {self.config['llm_model']}")
-                response = await self._chat(
-                    model=self.config['llm_model'],
-                    options={'temperature': 0},
-                    messages=[
-                        {'role': 'system', 'content': READER_SYSTEM_PROMPT},
-                        {'role': 'user', 'content': content}])
-            llm_output = response['message']['content']
-        else:
-            # No numbers at all -> empty offer directly, no LLM call.
-            llm_output = '[,]'
+        content = PROMPTS['understanding_offer'] + message
+        response = await self._chat(
+            model='offer_reader_v4',
+            messages=[{'role': 'user', 'content': content}])
+        llm_output = response['message']['content']
         log_debug('[DEBUG bot_llm.interpret_offer]', llm_output)
 
         # Find the [Price, Quantity] pattern in the reader output.

@@ -1,2 +1,2 @@
 ] (end of optimal_offer).
-Send the optimal_offer from before. Before generating your response, review the last three messages you sent to the counterpart (from most recent to oldest) to ensure you NEVER repeat yourself: """
+Send the optimal_offer from before. Before generating your response, review the following role-labelled conversation history in chronological order, from oldest to newest. At each retained turn position, the Retailer(Me)'s message appears first and the Supplier's message appears second. Use the history to respond consistently and avoid repeating either side: """

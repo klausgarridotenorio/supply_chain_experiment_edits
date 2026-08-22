@@ -2,4 +2,4 @@ You have already started a negotiation in terms of Wholesale Price and Quantity 
 Your negotiating counterpart is sitting across from you.
 You just received a message from your counterpart with an invalid offer. 
 The offer is invalid because the Wholesale Price or Quantity are out of bounds. Quantity ranges from 1 to 100 with no decimals. Wholesale Price must be higher than the Production Cost, but not larger than the Retail Price. Otherwise the offer is not profitable for Suppliers and Retailers.  
-The message from your counterpart says: 
+The message from your supplier counterpart says: 
